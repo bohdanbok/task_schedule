@@ -8,15 +8,28 @@
 <body>
   <div class="container mt-4">
     <h1>Задачи</h1>
+
+    <!-- Форма добавления новой задачи -->
     <form method="post" class="mb-3">
       <div class="input-group">
         <input name="title" type="text" class="form-control" placeholder="Новая задача..." required>
         <button class="btn btn-primary">Добавить</button>
       </div>
     </form>
+
+    <!-- Список задач -->
     <ul class="list-group">
       {% for task in tasks %}
-        <li class="list-group-item">{{ task.title }}</li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <!-- Если выполнена, зачёркиваем текст -->
+          <span class="{{ 'text-decoration-line-through' if task.completed }}">
+            {{ task.title }}
+          </span>
+          <!-- Кнопка отметки выполнения -->
+          <a href="{{ url_for('toggle', idx=loop.index0) }}" class="btn btn-sm btn-outline-success">
+            {% if task.completed %}↺{% else %}✓{% endif %}
+          </a>
+        </li>
       {% endfor %}
       {% if not tasks %}
         <li class="list-group-item text-muted">Задачи отсутствуют</li>
