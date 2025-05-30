@@ -1,14 +1,13 @@
+<!-- templates/index.html -->
 <!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <title>Список задач</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .note-edit-form {
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container mt-4">
@@ -16,7 +15,7 @@
 
     <!-- Категории -->
     <h2 class="mt-4">Категории</h2>
-    <form method="post" action="{{ url_for('add_category') }}" class="mb-3">
+    <form method="post" action="{{ url_for('main.add_category') }}" class="mb-3">
       <div class="input-group">
         <input name="category_name" type="text" class="form-control" placeholder="Новая категория..." required>
         <button class="btn btn-secondary">Добавить категорию</button>
@@ -25,7 +24,7 @@
 
     <!-- Добавление задачи -->
     <h2 class="mt-4">Добавить задачу</h2>
-    <form method="post" action="{{ url_for('add_task') }}" class="mb-3">
+    <form method="post" action="{{ url_for('main.add_task') }}" class="mb-3">
       <div class="row g-2 mb-2">
         <div class="col">
           <input name="title" type="text" class="form-control" placeholder="Заголовок задачи..." required>
@@ -40,14 +39,14 @@
         </div>
       </div>
       <textarea name="note" class="form-control mb-2" placeholder="Заметка (необязательно)"></textarea>
+      <input name="deadline" type="text" class="form-control mb-2 flatpickr-date" placeholder="дд.мм.гггг">
       <button class="btn btn-primary">Добавить</button>
     </form>
 
     <!-- Список задач -->
     {% for cat in categories %}
-      <h3 class="mt-4">
-        {{ cat.name }}
-        <a href="{{ url_for('delete_category', cat_id=cat.id) }}" class="btn btn-sm btn-outline-danger ms-2">✕</a>
+      <h3 class="mt-4">{{ cat.name }}
+        <a href="{{ url_for('main.delete_category', cat_id=cat.id) }}" class="btn btn-sm btn-outline-danger ms-2">✕</a>
       </h3>
       <ul class="list-group mb-3">
         {% for task in tasks_by_cat[cat.id] %}
@@ -55,29 +54,32 @@
             <div class="d-flex justify-content-between">
               <div style="width: 100%;">
                 <strong class="{{ 'text-decoration-line-through' if task.completed }}">{{ task.title }}</strong>
-
-                <!-- Отображение заметки -->
-                {% if task.note %}
-                  <div id="note-display-{{ task.id }}" class="text-muted small mt-1">{{ task.note }}</div>
-                {% endif %}
+                {% if task.note %}<div id="note-display-{{ task.id }}" class="text-muted small">{{ task.note }}</div>{% endif %}
+                {% if task.deadline %}<div class="text-danger small">До: {{ task.deadline.strftime('%d.%m.%Y') }}</div>{% endif %}
+                <div class="text-muted small">Создано: {{ task.created_at.strftime('%d.%m.%Y') }}</div>
 
                 <!-- Форма редактирования заметки -->
-                <form method="post" action="{{ url_for('edit_note', task_id=task.id) }}" class="note-edit-form mt-2" id="note-form-{{ task.id }}">
+                <form method="post" action="{{ url_for('main.edit_note', task_id=task.id) }}" class="note-edit-form mt-2" id="note-form-{{ task.id }}">
                   <div class="input-group input-group-sm">
                     <input name="new_note" type="text" class="form-control" value="{{ task.note or '' }}">
                     <button class="btn btn-outline-primary">💾</button>
                     <button type="button" class="btn btn-outline-secondary" onclick="toggleEdit({{ task.id }}, false)">Отмена</button>
                   </div>
                 </form>
+
+                <!-- Форма редактирования дедлайна -->
+                <form method="post" action="{{ url_for('main.edit_deadline', task_id=task.id) }}" class="d-flex align-items-center gap-2 mt-2" style="max-width: 360px;">
+                  <input name="new_deadline" type="text" class="form-control form-control-sm flatpickr-date" value="{{ task.deadline.strftime('%d.%m.%Y') if task.deadline else '' }}" placeholder="дд.мм.гггг" style="max-width: 150px;">
+                  <button class="btn btn-sm btn-outline-primary px-2">💾</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary px-2" onclick="this.closest('form').style.display='none'">Отмена</button>
+                </form>
               </div>
 
               <!-- Кнопки действий -->
               <div class="d-flex align-items-start gap-1 ms-2 flex-shrink-0">
                 <a href="#" onclick="toggleEdit({{ task.id }}, true)" class="btn btn-sm btn-outline-warning">✏</a>
-                <a href="{{ url_for('toggle_task', task_id=task.id) }}" class="btn btn-sm btn-outline-success">
-                  {% if task.completed %}↺{% else %}✓{% endif %}
-                </a>
-                <a href="{{ url_for('delete_task', task_id=task.id) }}" class="btn btn-sm btn-outline-danger">✕</a>
+                <a href="{{ url_for('main.toggle_task', task_id=task.id) }}" class="btn btn-sm btn-outline-success">{% if task.completed %}↺{% else %}✓{% endif %}</a>
+                <a href="{{ url_for('main.delete_task', task_id=task.id) }}" class="btn btn-sm btn-outline-danger">✕</a>
               </div>
             </div>
           </li>
@@ -89,13 +91,16 @@
     {% endfor %}
   </div>
 
+  <!-- Календарь -->
+  <div id="calendar"></div>
+
   <script>
-    function toggleEdit(taskId, show) {
-      const form = document.getElementById('note-form-' + taskId);
-      const display = document.getElementById('note-display-' + taskId);
-      if (form) form.style.display = show ? 'block' : 'none';
-      if (display) display.style.display = show ? 'none' : 'block';
-    }
+  window.deadlineEvents = {{ deadline_events|tojson }};
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
