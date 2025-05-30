@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // FullCalendar
+  // Инициализация календаря FullCalendar
   const calendarEl = document.getElementById('calendar');
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   calendar.render();
 
-  // Flatpickr для всех дат
-  flatpickr('.flatpickr-date', {
-    dateFormat: 'd.m.Y',
-    locale: 'ru'
+  // Инициализация всех инпутов дедлайна с flatpickr
+  flatpickr("input[name='deadline'], input[name='new_deadline']", {
+    dateFormat: "d.m.Y",
+    locale: "ru"
   });
 });
 
@@ -26,4 +26,11 @@ function toggleEdit(taskId, show) {
   const display = document.getElementById('note-display-' + taskId);
   if (form) form.style.display = show ? 'block' : 'none';
   if (display) display.style.display = show ? 'none' : 'block';
+}
+
+function toggleDeadlineEdit(taskId, show) {
+  const form = document.getElementById('deadline-form-' + taskId);
+  const display = document.getElementById('deadline-display-' + taskId);
+  if (form) form.style.display = show ? 'inline-flex' : 'none';
+  if (display) display.style.display = show ? 'none' : 'inline';
 }
