@@ -212,9 +212,10 @@ h2 {
 
 .create-buttons .btn {
     padding: 10px 20px;
-    width: 150px;
+    width: 180px; /* Увеличиваем ширину, чтобы текст помещался */
     text-align: center;
     border-radius: 6px;
+    white-space: nowrap; /* Запрещаем перенос текста */
 }
 
 /* Стили для попапов */
