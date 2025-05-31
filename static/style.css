@@ -115,7 +115,7 @@ h2 {
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: move; /* Курсор для перетаскивания */
+    cursor: move;
 }
 
 .category:hover {
@@ -140,7 +140,6 @@ h2 {
     position: relative;
 }
 
-/* Обеспечение читаемости текста на цветном фоне */
 .category-header::before {
     content: '';
     position: absolute;
@@ -159,7 +158,6 @@ h2 {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Стили для задачи */
 .task-item {
     display: flex;
     justify-content: space-between;
@@ -191,7 +189,14 @@ h2 {
     color: #95a5a6;
 }
 
-/* Стили для кнопок редактирования */
+.task-image {
+    max-width: 100px;
+    max-height: 100px;
+    cursor: pointer;
+    margin-top: 5px;
+    border-radius: 4px;
+}
+
 .task-actions {
     display: flex;
     gap: 8px;
@@ -227,7 +232,6 @@ h2 {
     color: #721c24;
 }
 
-/* Стили для кнопок создания */
 .create-buttons {
     position: fixed;
     top: 20px;
@@ -246,7 +250,6 @@ h2 {
     white-space: nowrap;
 }
 
-/* Стили для попапов */
 .popup {
     position: fixed;
     top: 0;
@@ -291,7 +294,6 @@ h2 {
     background: #5a6268;
 }
 
-/* Стили для формы ввода */
 .input-group {
     position: relative;
     display: flex;
@@ -334,7 +336,10 @@ select.input {
     background-size: 16px;
 }
 
-/* Стили для выбора цвета */
+.file-input {
+    padding: 10px 10px 10px 40px;
+}
+
 .color-picker {
     padding: 10px 10px 10px 40px;
     border: 1px solid #d1d5db;
@@ -345,12 +350,10 @@ select.input {
     cursor: pointer;
 }
 
-/* Стили для формы редактирования */
 .edit-form .input-group {
     margin-bottom: 10px;
 }
 
-/* Стили для кнопок */
 .button-group {
     display: flex;
     gap: 8px;
@@ -406,26 +409,54 @@ select.input {
     display: none;
 }
 
+/* Модальное окно для изображения */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+#modal-image {
+    max-width: 90%;
+    max-height: 90%;
+}
+
 /* Адаптивность */
 @media (max-width: 600px) {
     .calendar-wrapper {
-        top: 10px; /* Поднимаем календарь выше */
+        top: 10px;
         right: 10px;
         width: 250px;
-        border-radius: 12px; /* Скругляем углы всего блока */
-        overflow: hidden; /* Убедимся, что содержимое не выходит за скругленные углы */
+        border-radius: 12px;
+        overflow: hidden;
     }
 
     .calendar-toggle {
-        border-radius: 12px 12px 0 0; /* Скругляем углы кнопки сверху */
+        border-radius: 12px 12px 0 0;
     }
 
     #calendar {
-        border-radius: 0 0 12px 12px; /* Скругляем углы календаря снизу */
+        border-radius: 0 0 12px 12px;
     }
 
     #calendar.collapsed {
-        border-radius: 0; /* Убираем скругление при сворачивании */
+        border-radius: 0;
     }
 
     .create-buttons {

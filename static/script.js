@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
     let calendar;
     if (calendarEl) {
-        console.log('Initializing calendar...'); // Отладка
+        console.log('Initializing calendar...');
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             height: 'auto',
@@ -22,19 +22,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
-        console.log('Rendering calendar...'); // Отладка
+        console.log('Rendering calendar...');
         calendar.render();
     } else {
-        console.error('Calendar element not found!'); // Отладка
+        console.error('Calendar element not found!');
     }
 
-    // Синхронизация существующих задач с дедлайнами
     window.deadlineEvents = window.deadlineEvents || [];
     document.querySelectorAll('.task-item').forEach(taskElement => {
         const taskId = taskElement.getAttribute('data-task-id');
         const title = taskElement.querySelector('strong').textContent;
-        const noteDisplay = taskElement.querySelector(`#note-display-${taskId}`);
-        const deadlineElement = Array.from(noteDisplay.querySelectorAll('p')).find(p => p.textContent.startsWith('До: '));
+        const taskDisplay = taskElement.querySelector(`#task-display-${taskId}`);
+        const deadlineElement = Array.from(taskDisplay.querySelectorAll('p')).find(p => p.textContent.startsWith('До: '));
         const deadlineText = deadlineElement ? deadlineElement.textContent : '';
         const completed = taskElement.querySelector('strong').classList.contains('completed');
         if (deadlineText && deadlineText.startsWith('До: ')) {
@@ -65,8 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calendar.render();
     }
 
-    // Flatpickr для полей с дедлайнами
-    flatpickr("input[name='deadline'], input[name='new_deadline']", {
+    flatpickr(".deadline-input", {
         dateFormat: "d.m.Y",
         locale: "ru"
     });
@@ -78,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Drag-and-Drop для категорий
     const categories = document.querySelectorAll('.category');
     const container = document.querySelector('.container');
 
@@ -138,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
-    // Сворачивание/разворачивание календаря
     const calendarToggle = document.querySelector('.calendar-toggle');
     const calendarElement = document.getElementById('calendar');
     if (calendarToggle && calendarElement) {
@@ -147,15 +143,14 @@ document.addEventListener('DOMContentLoaded', function () {
             calendarElement.classList.toggle('calendar-expanded', !isCollapsed);
             calendarToggle.textContent = isCollapsed ? '🔼' : '🔽';
             if (!isCollapsed && calendar) {
-                console.log('Re-rendering calendar after expanding...'); // Отладка
-                calendar.render(); // Перерисовываем календарь при разворачивании
+                console.log('Re-rendering calendar after expanding...');
+                calendar.render();
             }
         });
     } else {
-        console.error('Calendar toggle or calendar element not found!'); // Отладка
+        console.error('Calendar toggle or calendar element not found!');
     }
 
-    // Открытие и закрытие попапов
     document.getElementById('create-category-btn')?.addEventListener('click', function () {
         document.getElementById('category-popup').style.display = 'flex';
     });
@@ -179,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('edit-color-form').reset();
     });
 
-    // Добавление категории
     document.getElementById('add-category-form')?.addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -217,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Редактирование цвета категории
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('edit-category-color')) {
             const catId = e.target.getAttribute('data-cat-id');
@@ -250,7 +243,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Функция для конвертации RGB в HEX
     function rgbToHex(rgb) {
         if (rgb.startsWith('#')) return rgb;
         const rgbValues = rgb.match(/\d+/g);
@@ -261,7 +253,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return `#${r}${g}${b}`;
     }
 
-    // Добавление задачи
     document.getElementById('add-task-form')?.addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -272,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
+            console.log('Server response:', data); // Отладочный лог
             if (data.success) {
                 const categoryId = formData.get('category_id');
                 const createdAt = new Date().toLocaleDateString('ru-RU', {
@@ -279,80 +271,139 @@ document.addEventListener('DOMContentLoaded', function () {
                     month: '2-digit',
                     year: 'numeric'
                 });
+                let fileListHtml = '';
+                // Проверяем, есть ли file_urls и является ли это строкой
+                if (data.file_urls && typeof data.file_urls === 'string' && data.file_urls.trim() !== '') {
+                    console.log('Processing file URLs:', data.file_urls);
+                    fileListHtml = '<div class="file-list">';
+                    const fileUrls = data.file_urls.split(',').filter(url => url.trim() !== '');
+                    fileUrls.forEach(url => {
+                        const filename = url.split('_').pop();
+                        const isImage = url.toLowerCase().endsWith('.png') || url.toLowerCase().endsWith('.jpg') ||
+                                       url.toLowerCase().endsWith('.jpeg') || url.toLowerCase().endsWith('.gif');
+                        const isDocument = url.toLowerCase().endsWith('.pdf') || url.toLowerCase().endsWith('.docx') ||
+                                          url.toLowerCase().endsWith('.csv') || url.toLowerCase().endsWith('.xlsx');
+                        if (isImage) {
+                            fileListHtml += `<img src="${url}" alt="${filename}" class="task-image" data-full-url="${url}">`;
+                        } else if (isDocument) {
+                            fileListHtml += `<a href="#" class="file-link" data-file-url="${url}">${filename}</a>`;
+                        } else {
+                            console.warn('Unsupported file type:', url);
+                        }
+                    });
+                    fileListHtml += '</div>';
+                } else {
+                    console.log('No file URLs received or empty file_urls:', data.file_urls);
+                }
+
+                const note = formData.get('note') || '';
+                const deadline = formData.get('deadline') || '';
+                const title = formData.get('title') || 'Без названия';
+
                 const newTask = `
                     <div class="task-item" id="task-${data.task_id}" data-task-id="${data.task_id}">
                         <div class="task-content">
-                            <div id="note-display-${data.task_id}">
-                                <strong class="${data.completed ? 'completed' : ''}">${formData.get('title')}</strong>
-                                ${formData.get('note') ? `<p>${formData.get('note')}</p>` : ''}
-                                ${formData.get('deadline') ? `<p>До: ${formData.get('deadline')}</p>` : ''}
+                            <div id="task-display-${data.task_id}">
+                                <strong class="${data.completed ? 'completed' : ''}">${title}</strong>
+                                ${note ? `<p>${note}</p>` : ''}
+                                ${deadline ? `<p>До: ${deadline}</p>` : ''}
                                 <p>Создано: ${createdAt}</p>
+                                ${fileListHtml}
                             </div>
-                            <form id="note-form-${data.task_id}" class="edit-form edit-note-form" style="display: none;">
+                            <form id="edit-task-form-${data.task_id}" class="edit-form" style="display: none;">
                                 <div class="input-group">
                                     <span class="input-icon">📝</span>
-                                    <textarea name="new_note" class="input" placeholder="Введите заметку">${formData.get('note') || ''}</textarea>
+                                    <textarea name="new_note" class="input" placeholder="Введите заметку">${note}</textarea>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-icon">🗓️</span>
+                                    <input type="text" name="new_deadline" value="${deadline}" placeholder="ДД.ММ.ГГГГ" class="input deadline-input">
+                                </div>
+                                ${fileListHtml ? `
+                                    <div class="existing-files">
+                                        <p>Существующие файлы (отметьте для удаления):</p>
+                                        ${data.file_urls.split(',').filter(url => url.trim() !== '').map(url => `<label><input type="checkbox" name="delete_files" value="${url}">${url.split('_').pop()}</label>`).join('')}
+                                    </div>` : ''}
+                                <div class="input-group">
+                                    <span class="input-icon">📎</span>
+                                    <input type="file" name="file" class="input file-input" accept=".pdf,.docx,.png,.jpg,.jpeg,.gif,.csv,.xlsx" multiple>
                                 </div>
                                 <div class="button-group">
-                                    <button type="submit" class="btn btn-save">💾</button>
-                                    <button type="button" class="cancel-note-edit btn" data-task-id="${data.task_id}">Отмена</button>
+                                    <button type="submit" class="btn btn-save" data-task-id="${data.task_id}">Сохранить</button>
+                                    <button type="button" class="cancel-edit btn" data-task-id="${data.task_id}">Отмена</button>
                                 </div>
                             </form>
-                            <div id="deadline-form-${data.task_id}" class="edit-form" style="display: none;">
-                                <form class="edit-deadline-form">
-                                    <div class="input-group">
-                                        <span class="input-icon">🗓️</span>
-                                        <input type="text" name="new_deadline" value="${formData.get('deadline') || ''}" placeholder="ДД.ММ.ГГГГ" class="input">
-                                    </div>
-                                    <div class="button-group">
-                                        <button type="submit" class="btn btn-save">💾</button>
-                                        <button type="button" class="cancel-deadline-edit btn" data-task-id="${data.task_id}">Отмена</button>
-                                    </div>
-                                </form>
-                            </div>
                         </div>
                         <div class="task-actions">
-                            <button class="deadline-edit-button btn-action" data-task-id="${data.task_id}" title="Редактировать дедлайн">🗓️</button>
-                            <button class="note-edit-button btn-action" data-task-id="${data.task_id}" title="Редактировать заметку">✏️</button>
+                            <button class="edit-task-button btn-action" data-task-id="${data.task_id}" title="Редактировать задачу">✏️</button>
                             <a href="#" class="toggle-task btn-action" data-task-id="${data.task_id}" title="${data.completed ? 'Возобновить' : 'Завершить'}">${data.completed ? '↺' : '✓'}</a>
                             <a href="#" class="delete-task btn-action btn-action-danger" data-task-id="${data.task_id}" title="Удалить">✕</a>
                         </div>
                     </div>`;
-                document.getElementById(`task-container-${categoryId}`).insertAdjacentHTML('beforeend', newTask);
-                const newDeadlineInput = document.querySelector(`#deadline-form-${data.task_id} input[name="new_deadline"]`);
-                if (newDeadlineInput) {
-                    flatpickr(newDeadlineInput, { dateFormat: "d.m.Y", locale: "ru" });
+                const taskContainer = document.getElementById(`task-container-${categoryId}`);
+                if (taskContainer) {
+                    console.log('Adding task to DOM:', newTask);
+                    taskContainer.insertAdjacentHTML('beforeend', newTask);
+                    const newDeadlineInput = document.querySelector(`#edit-task-form-${data.task_id} .deadline-input`);
+                    if (newDeadlineInput) {
+                        flatpickr(newDeadlineInput, { dateFormat: "d.m.Y", locale: "ru" });
+                    } else {
+                        console.error('Deadline input not found for new task:', data.task_id);
+                    }
+                } else {
+                    console.error('Task container not found for category:', categoryId);
                 }
                 if (data.deadline) {
                     window.deadlineEvents.push({
                         id: data.task_id,
-                        title: data.title,
+                        title: data.title || title,
                         start: data.deadline,
                         color: '#dc3545',
                         completed: false
                     });
                     updateCalendarEvents();
                 }
-                document.getElementById('task-popup').style.display = 'none';
+                // Закрываем модальное окно после успешного добавления
+                const taskPopup = document.getElementById('task-popup');
+                if (taskPopup) {
+                    console.log('Closing task popup after adding task');
+                    taskPopup.style.display = 'none';
+                } else {
+                    console.error('Task popup not found!');
+                }
                 this.reset();
+            } else {
+                console.error('Failed to add task:', data);
+                // Пытаемся закрыть окно даже в случае ошибки
+                const taskPopup = document.getElementById('task-popup');
+                if (taskPopup) {
+                    console.log('Closing task popup after error');
+                    taskPopup.style.display = 'none';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error adding task:', error);
+            // Пытаемся закрыть окно даже в случае ошибки
+            const taskPopup = document.getElementById('task-popup');
+            if (taskPopup) {
+                console.log('Closing task popup after error');
+                taskPopup.style.display = 'none';
             }
         });
     });
 
-    // Делегирование событий для кнопок
     document.addEventListener('click', function (e) {
-        const target = e.target;
-
-        if (target.classList.contains('toggle-tasks')) {
+        if (e.target.classList.contains('toggle-tasks')) {
             e.preventDefault();
-            const catId = target.getAttribute('data-cat-id');
+            const catId = e.target.getAttribute('data-cat-id');
             const container = document.getElementById(`task-container-${catId}`);
             if (container) container.classList.toggle('d-none');
         }
 
-        if (target.classList.contains('delete-category')) {
+        if (e.target.classList.contains('delete-category')) {
             e.preventDefault();
-            const catId = target.getAttribute('data-cat-id');
+            const catId = e.target.getAttribute('data-cat-id');
             if (confirm('Вы уверены, что хотите удалить категорию?')) {
                 fetch(`/delete_category/${catId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(response => response.json())
@@ -374,23 +425,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        if (target.classList.contains('deadline-edit-button')) {
-            const taskId = target.getAttribute('data-task-id');
-            document.getElementById(`deadline-form-${taskId}`).style.display = 'block';
-            document.getElementById(`note-display-${taskId}`).style.display = 'none';
-            target.style.display = 'none';
+        if (e.target.classList.contains('edit-task-button')) {
+            const taskId = e.target.getAttribute('data-task-id');
+            document.getElementById(`edit-task-form-${taskId}`).style.display = 'block';
+            document.getElementById(`task-display-${taskId}`).style.display = 'none';
+            e.target.style.display = 'none';
         }
 
-        if (target.classList.contains('note-edit-button')) {
-            const taskId = target.getAttribute('data-task-id');
-            document.getElementById(`note-form-${taskId}`).style.display = 'block';
-            document.getElementById(`note-display-${taskId}`).style.display = 'none';
-            target.style.display = 'none';
+        if (e.target.classList.contains('cancel-edit')) {
+            const taskId = e.target.getAttribute('data-task-id');
+            document.getElementById(`edit-task-form-${taskId}`).style.display = 'none';
+            document.getElementById(`task-display-${taskId}`).style.display = 'block';
+            document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`).style.display = 'inline-block';
         }
 
-        if (target.classList.contains('toggle-task')) {
+        if (e.target.classList.contains('toggle-task')) {
             e.preventDefault();
-            const taskId = target.getAttribute('data-task-id');
+            const taskId = e.target.getAttribute('data-task-id');
             fetch(`/toggle_task/${taskId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(response => response.json())
                 .then(data => {
@@ -398,8 +449,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const taskElement = document.getElementById(`task-${taskId}`);
                         const titleElement = taskElement.querySelector('strong');
                         titleElement.classList.toggle('completed', data.completed);
-                        target.textContent = data.completed ? '↺' : '✓';
-                        target.setAttribute('title', data.completed ? 'Возобновить' : 'Завершить');
+                        e.target.textContent = data.completed ? '↺' : '✓';
+                        e.target.setAttribute('title', data.completed ? 'Возобновить' : 'Завершить');
                         const eventIndex = window.deadlineEvents.findIndex(event => event.id === String(data.task_id));
                         if (eventIndex !== -1) {
                             window.deadlineEvents[eventIndex].color = data.color;
@@ -410,9 +461,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
 
-        if (target.classList.contains('delete-task')) {
+        if (e.target.classList.contains('delete-task')) {
             e.preventDefault();
-            const taskId = target.getAttribute('data-task-id');
+            const taskId = e.target.getAttribute('data-task-id');
             if (confirm('Вы уверены, что хотите удалить задачу?')) {
                 fetch(`/delete_task/${taskId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(response => response.json())
@@ -429,28 +480,43 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        if (target.classList.contains('cancel-note-edit')) {
-            const taskId = target.getAttribute('data-task-id');
-            document.getElementById(`note-form-${taskId}`).style.display = 'none';
-            document.getElementById(`note-display-${taskId}`).style.display = 'block';
-            document.querySelector(`.note-edit-button[data-task-id="${taskId}"]`).style.display = 'inline-block';
+        if (e.target.closest('.task-image')) {
+            const fullUrl = e.target.closest('.task-image').getAttribute('data-full-url');
+            const modal = document.getElementById('image-modal');
+            const modalImage = document.getElementById('modal-image');
+            modalImage.src = fullUrl;
+            modal.style.display = 'flex';
         }
 
-        if (target.classList.contains('cancel-deadline-edit')) {
-            const taskId = target.getAttribute('data-task-id');
-            document.getElementById(`deadline-form-${taskId}`).style.display = 'none';
-            document.getElementById(`note-display-${taskId}`).style.display = 'block';
-            document.querySelector(`.deadline-edit-button[data-task-id="${taskId}"]`).style.display = 'inline-block';
+        if (e.target.closest('.file-link')) {
+            e.preventDefault();
+            const fileUrl = e.target.closest('.file-link').getAttribute('data-file-url');
+            const filename = e.target.closest('.file-link').textContent;
+            const modal = document.getElementById('document-modal');
+            const documentName = document.getElementById('document-name');
+            const documentDownload = document.getElementById('document-download');
+            documentName.textContent = filename;
+            documentDownload.href = fileUrl;
+            modal.style.display = 'flex';
+        }
+
+        if (e.target.classList.contains('modal-close')) {
+            const modal = document.getElementById('image-modal');
+            modal.style.display = 'none';
+        }
+
+        if (e.target.classList.contains('document-modal-close')) {
+            const modal = document.getElementById('document-modal');
+            modal.style.display = 'none';
         }
     });
 
-    // Обработчик для форм редактирования заметки
     document.addEventListener('submit', function (e) {
-        if (e.target.classList.contains('edit-note-form')) {
+        if (e.target.classList.contains('edit-form')) {
             e.preventDefault();
-            const taskId = e.target.id.split('-').pop();
+            const taskId = e.target.querySelector('.btn-save').getAttribute('data-task-id');
             const formData = new FormData(e.target);
-            fetch(`/edit_note/${taskId}`, {
+            fetch(`/edit_task/${taskId}`, {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -458,72 +524,134 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const noteDisplay = document.getElementById(`note-display-${taskId}`);
-                    const noteP = noteDisplay.querySelector('p:not(:last-child)');
-                    if (data.note) {
-                        if (noteP) {
-                            noteP.textContent = data.note;
-                        } else {
-                            noteDisplay.insertAdjacentHTML('afterbegin', `<p>${data.note}</p>`);
-                        }
-                    } else if (noteP) {
-                        noteP.remove();
+                    const taskElement = document.getElementById(`task-${taskId}`);
+                    const createdAt = taskElement.querySelector('p')?.textContent?.startsWith('Создано: ')
+                        ? taskElement.querySelector('p').textContent
+                        : `Создано: ${new Date().toLocaleDateString('ru-RU')}`;
+
+                    // Пересоздаём весь task-item для полной синхронизации
+                    let fileListHtml = '';
+                    if (data.file_urls && typeof data.file_urls === 'string' && data.file_urls.trim() !== '') {
+                        fileListHtml = '<div class="file-list">';
+                        const fileUrls = data.file_urls.split(',').filter(url => url.trim() !== '');
+                        fileUrls.forEach(url => {
+                            const filename = url.split('_').pop();
+                            const isImage = url.toLowerCase().endsWith('.png') || url.toLowerCase().endsWith('.jpg') ||
+                                           url.toLowerCase().endsWith('.jpeg') || url.toLowerCase().endsWith('.gif');
+                            const isDocument = url.toLowerCase().endsWith('.pdf') || url.toLowerCase().endsWith('.docx') ||
+                                              url.toLowerCase().endsWith('.csv') || url.toLowerCase().endsWith('.xlsx');
+                            if (isImage) {
+                                fileListHtml += `<img src="${url}" alt="${filename}" class="task-image" data-full-url="${url}">`;
+                            } else if (isDocument) {
+                                fileListHtml += `<a href="#" class="file-link" data-file-url="${url}">${filename}</a>`;
+                            }
+                        });
+                        fileListHtml += '</div>';
                     }
-                    document.getElementById(`note-form-${taskId}`).style.display = 'none';
-                    noteDisplay.style.display = 'block';
-                    document.querySelector(`.note-edit-button[data-task-id="${taskId}"]`).style.display = 'inline-block';
-                }
-            });
-        }
-    });
 
-    // Обработчик для форм редактирования дедлайна
-    document.addEventListener('submit', function (e) {
-        if (e.target.classList.contains('edit-deadline-form')) {
-            e.preventDefault();
-            const taskId = e.target.closest('.task-item').getAttribute('data-task-id');
-            const formData = new FormData(e.target);
-            fetch(`/edit_deadline/${taskId}`, {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const noteDisplay = document.getElementById(`note-display-${taskId}`);
-                    const deadlineP = Array.from(noteDisplay.querySelectorAll('p')).find(p => p.textContent.startsWith('До: '));
+                    const newTaskHtml = `
+                        <div class="task-content">
+                            <div id="task-display-${taskId}">
+                                <strong class="${data.completed ? 'completed' : ''}">${data.title}</strong>
+                                ${data.note ? `<p>${data.note}</p>` : ''}
+                                ${data.deadline ? `<p>До: ${data.deadline.split('-').reverse().join('.')}</p>` : ''}
+                                <p>${createdAt}</p>
+                                ${fileListHtml}
+                            </div>
+                            <form id="edit-task-form-${taskId}" class="edit-form" style="display: none;">
+                                <div class="input-group">
+                                    <span class="input-icon">📝</span>
+                                    <textarea name="new_note" class="input" placeholder="Введите заметку">${data.note || ''}</textarea>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-icon">🗓️</span>
+                                    <input type="text" name="new_deadline" value="${data.deadline ? data.deadline.split('-').reverse().join('.') : ''}" placeholder="ДД.ММ.ГГГГ" class="input deadline-input">
+                                </div>
+                                ${fileListHtml ? `
+                                    <div class="existing-files">
+                                        <p>Существующие файлы (отметьте для удаления):</p>
+                                        ${data.file_urls.split(',').filter(url => url.trim() !== '').map(url => `<label><input type="checkbox" name="delete_files" value="${url}">${url.split('_').pop()}</label>`).join('')}
+                                    </div>` : ''}
+                                <div class="input-group">
+                                    <span class="input-icon">📎</span>
+                                    <input type="file" name="file" class="input file-input" accept=".pdf,.docx,.png,.jpg,.jpeg,.gif,.csv,.xlsx" multiple>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-save" data-task-id="${taskId}">Сохранить</button>
+                                    <button type="button" class="cancel-edit btn" data-task-id="${taskId}">Отмена</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="task-actions">
+                            <button class="edit-task-button btn-action" data-task-id="${taskId}" title="Редактировать задачу">✏️</button>
+                            <a href="#" class="toggle-task btn-action" data-task-id="${taskId}" title="${data.completed ? 'Возобновить' : 'Завершить'}">${data.completed ? '↺' : '✓'}</a>
+                            <a href="#" class="delete-task btn-action btn-action-danger" data-task-id="${taskId}" title="Удалить">✕</a>
+                        </div>`;
+
+                    taskElement.innerHTML = newTaskHtml;
+                    const newDeadlineInput = taskElement.querySelector(`#edit-task-form-${taskId} .deadline-input`);
+                    if (newDeadlineInput) {
+                        flatpickr(newDeadlineInput, { dateFormat: "d.m.Y", locale: "ru" });
+                    }
+
+                    // Заново находим элементы после пересоздания DOM
+                    const updatedEditForm = document.getElementById(`edit-task-form-${taskId}`);
+                    const updatedTaskDisplay = document.getElementById(`task-display-${taskId}`);
+                    const editButton = document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`);
+
+                    // Устанавливаем видимость
+                    if (updatedEditForm && updatedTaskDisplay) {
+                        console.log('Hiding edit form and showing task display after edit');
+                        updatedEditForm.style.display = 'none';
+                        updatedTaskDisplay.style.display = 'block';
+                    } else {
+                        console.error('Edit form or task display not found after update!');
+                    }
+                    if (editButton) {
+                        editButton.style.display = 'inline-block';
+                    }
+
+                    // Обновляем календарь
                     const existingEventIndex = window.deadlineEvents.findIndex(event => event.id === taskId);
                     if (data.deadline) {
-                        const formattedDeadline = data.deadline.split('-').reverse().join('.');
-                        if (deadlineP) {
-                            deadlineP.textContent = `До: ${formattedDeadline}`;
-                        } else {
-                            noteDisplay.insertAdjacentHTML('beforeend', `<p>До: ${formattedDeadline}</p>`);
-                        }
+                        const deadlineDate = data.deadline;
                         if (existingEventIndex !== -1) {
-                            window.deadlineEvents[existingEventIndex].start = data.deadline;
+                            window.deadlineEvents[existingEventIndex].start = deadlineDate;
+                            window.deadlineEvents[existingEventIndex].title = data.title;
+                            window.deadlineEvents[existingEventIndex].completed = data.completed;
                         } else {
                             window.deadlineEvents.push({
                                 id: taskId,
-                                title: noteDisplay.querySelector('strong').textContent,
-                                start: data.deadline,
-                                color: '#dc3545',
-                                completed: false
+                                title: data.title,
+                                start: deadlineDate,
+                                color: data.completed ? '#6c757d' : '#dc3545',
+                                completed: data.completed
                             });
                         }
-                    } else if (deadlineP) {
-                        deadlineP.remove();
-                        if (existingEventIndex !== -1) {
-                            window.deadlineEvents.splice(existingEventIndex, 1);
-                        }
+                    } else if (existingEventIndex !== -1) {
+                        window.deadlineEvents.splice(existingEventIndex, 1);
                     }
-                    document.getElementById(`deadline-form-${taskId}`).style.display = 'none';
-                    noteDisplay.style.display = 'block';
-                    document.querySelector(`.deadline-edit-button[data-task-id="${taskId}"]`).style.display = 'inline-block';
+
                     updateCalendarEvents();
+                } else {
+                    console.error('Failed to edit task:', data);
                 }
+            })
+            .catch(error => {
+                console.error('Error editing task:', error);
             });
+        }
+    });
+
+    document.getElementById('image-modal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
+    document.getElementById('document-modal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.style.display = 'none';
         }
     });
 });
