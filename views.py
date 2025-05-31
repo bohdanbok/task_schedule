@@ -4,7 +4,6 @@ from datetime import datetime
 
 main = Blueprint('main', __name__)
 
-
 @main.route('/')
 def index():
     categories = Category.query.all()
@@ -27,17 +26,16 @@ def index():
     return render_template('index.html', categories=categories, tasks_by_cat=tasks_by_cat,
                            deadline_events=deadline_events)
 
-
 @main.route('/add_category', methods=['POST'])
 def add_category():
     category_name = request.form.get('category_name')
+    category_color = request.form.get('category_color', '#ffffff')  # По умолчанию белый
     if category_name:
-        new_category = Category(name=category_name)
+        new_category = Category(name=category_name, color=category_color)
         db.session.add(new_category)
         db.session.commit()
         return jsonify({'success': True, 'category_id': new_category.id})
     return jsonify({'success': False, 'message': 'Category name is required'})
-
 
 @main.route('/delete_category/<int:cat_id>')
 def delete_category(cat_id):
@@ -45,7 +43,6 @@ def delete_category(cat_id):
     db.session.delete(category)
     db.session.commit()
     return jsonify({'success': True})
-
 
 @main.route('/add_task', methods=['POST'])
 def add_task():
@@ -82,7 +79,6 @@ def add_task():
         'completed': new_task.completed
     })
 
-
 @main.route('/toggle_task/<int:task_id>')
 def toggle_task(task_id):
     task = Task.query.get_or_404(task_id)
@@ -95,14 +91,12 @@ def toggle_task(task_id):
         'color': '#6c757d' if task.completed else '#dc3545'
     })
 
-
 @main.route('/delete_task/<int:task_id>')
 def delete_task(task_id):
     task = Task.query.get_or_404(task_id)
     db.session.delete(task)
     db.session.commit()
     return jsonify({'success': True, 'task_id': task_id})
-
 
 @main.route('/edit_note/<int:task_id>', methods=['POST'])
 def edit_note(task_id):
@@ -111,7 +105,6 @@ def edit_note(task_id):
     task.note = new_note if new_note else None
     db.session.commit()
     return jsonify({'success': True, 'note': task.note})
-
 
 @main.route('/edit_deadline/<int:task_id>', methods=['POST'])
 def edit_deadline(task_id):

@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('add-category-form')?.addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
+        const color = formData.get('category_color') || '#ffffff';
         fetch('/add_category', {
             method: 'POST',
             body: formData,
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success) {
                 const newCategory = `
                     <div class="category" id="category-${data.category_id}">
-                        <h3 class="category-header">
+                        <h3 class="category-header" style="background-color: ${color};">
                             ${formData.get('category_name')}
                             <div class="button-group">
                                 <button class="toggle-tasks btn" data-cat-id="${data.category_id}">🔽</button>

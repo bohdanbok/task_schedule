@@ -19,7 +19,7 @@
 
         {% for cat in categories %}
             <div class="category" id="category-{{ cat.id }}">
-                <h3 class="category-header">
+                <h3 class="category-header" style="background-color: {{ cat.color }};">
                     {{ cat.name }}
                     <div class="button-group">
                         <button class="toggle-tasks btn" data-cat-id="{{ cat.id }}">🔽</button>
@@ -93,6 +93,10 @@
                 <div class="input-group">
                     <span class="input-icon">📁</span>
                     <input type="text" name="category_name" placeholder="Название категории" class="input">
+                </div>
+                <div class="input-group">
+                    <span class="input-icon">🎨</span>
+                    <input type="color" name="category_color" value="#ffffff" class="input color-picker">
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Добавить</button>

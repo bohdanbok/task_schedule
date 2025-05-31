@@ -101,6 +101,28 @@ h2 {
     font-size: 1.3em;
     color: #2c3e50;
     margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    position: relative;
+}
+
+/* Обеспечение читаемости текста на цветном фоне */
+.category-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    opacity: 0.9;
+    border-radius: 6px;
+    z-index: -1;
+}
+
+.category-header, .category-header * {
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Стили для задачи */
@@ -275,6 +297,13 @@ select.input {
     appearance: none;
     background: url('data:image/svg+xml;utf8,<svg fill="%236b7280" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 10px center;
     background-size: 16px;
+}
+
+/* Стили для выбора цвета */
+.color-picker {
+    padding: 5px;
+    height: 40px;
+    cursor: pointer;
 }
 
 /* Стили для формы редактирования */
