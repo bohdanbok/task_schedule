@@ -5,7 +5,7 @@ db = SQLAlchemy()
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    tasks = db.relationship('Task', backref='category', lazy=True)
+    tasks = db.relationship('Task', backref='category', lazy=True, cascade="all, delete-orphan")
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -14,4 +14,4 @@ class Task(db.Model):
     deadline = db.Column(db.Date, nullable=True)
     completed = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.Date, nullable=False, default=db.func.current_date())
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id', ondelete='CASCADE'), nullable=False)

@@ -74,6 +74,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Открытие и закрытие попапов
+    document.getElementById('create-category-btn')?.addEventListener('click', function () {
+        document.getElementById('category-popup').style.display = 'flex';
+    });
+
+    document.getElementById('create-task-btn')?.addEventListener('click', function () {
+        document.getElementById('task-popup').style.display = 'flex';
+    });
+
+    document.getElementById('cancel-category-btn')?.addEventListener('click', function () {
+        document.getElementById('category-popup').style.display = 'none';
+        document.getElementById('add-category-form').reset();
+    });
+
+    document.getElementById('cancel-task-btn')?.addEventListener('click', function () {
+        document.getElementById('task-popup').style.display = 'none';
+        document.getElementById('add-task-form').reset();
+    });
+
     // Добавление категории
     document.getElementById('add-category-form')?.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -104,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 newOption.value = data.category_id;
                 newOption.textContent = formData.get('category_name');
                 categorySelect.appendChild(newOption);
+                document.getElementById('category-popup').style.display = 'none';
                 this.reset();
             }
         });
@@ -122,34 +142,48 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 const categoryId = formData.get('category_id');
-                const toggleSymbol = data.completed ? '↺' : '✓';
+                const createdAt = new Date().toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
                 const newTask = `
                     <div class="task-item" id="task-${data.task_id}" data-task-id="${data.task_id}">
-                        <div id="note-display-${data.task_id}">
-                            <strong class="${data.completed ? 'completed' : ''}">${formData.get('title')}</strong>
-                            ${formData.get('note') ? `<p>${formData.get('note')}</p>` : ''}
-                            ${formData.get('deadline') ? `<p>До: ${formData.get('deadline')}</p>` : ''}
-                            <p>Создано: ${new Date().toLocaleDateString('ru-RU')}</p>
-                        </div>
-                        <form id="note-form-${data.task_id}" class="edit-form edit-note-form" style="display: none;">
-                            <textarea name="new_note" class="input" placeholder="Введите заметку">${formData.get('note') || ''}</textarea>
-                            <div class="button-group">
-                                <button type="submit" class="btn btn-save">💾</button>
-                                <button type="button" class="cancel-note-edit btn" data-task-id="${data.task_id}">Отмена</button>
+                        <div class="task-content">
+                            <div id="note-display-${data.task_id}">
+                                <strong class="${data.completed ? 'completed' : ''}">${formData.get('title')}</strong>
+                                ${formData.get('note') ? `<p>${formData.get('note')}</p>` : ''}
+                                ${formData.get('deadline') ? `<p>До: ${formData.get('deadline')}</p>` : ''}
+                                <p>Создано: ${createdAt}</p>
                             </div>
-                        </form>
-                        <div id="deadline-form-${data.task_id}" class="edit-form" style="display: none;">
-                            <form class="edit-deadline-form form-flex">
-                                <input type="text" name="new_deadline" value="${formData.get('deadline') || ''}" placeholder="ДД.ММ.ГГГГ" class="input">
-                                <button type="submit" class="btn btn-save">💾</button>
-                                <button type="button" class="cancel-deadline-edit btn" data-task-id="${data.task_id}">Отмена</button>
+                            <form id="note-form-${data.task_id}" class="edit-form edit-note-form" style="display: none;">
+                                <div class="input-group">
+                                    <span class="input-icon">📝</span>
+                                    <textarea name="new_note" class="input" placeholder="Введите заметку">${formData.get('note') || ''}</textarea>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-save">💾</button>
+                                    <button type="button" class="cancel-note-edit btn" data-task-id="${data.task_id}">Отмена</button>
+                                </div>
                             </form>
+                            <div id="deadline-form-${data.task_id}" class="edit-form" style="display: none;">
+                                <form class="edit-deadline-form">
+                                    <div class="input-group">
+                                        <span class="input-icon">🗓️</span>
+                                        <input type="text" name="new_deadline" value="${formData.get('deadline') || ''}" placeholder="ДД.ММ.ГГГГ" class="input">
+                                    </div>
+                                    <div class="button-group">
+                                        <button type="submit" class="btn btn-save">💾</button>
+                                        <button type="button" class="cancel-deadline-edit btn" data-task-id="${data.task_id}">Отмена</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        <div class="button-group">
-                            <button class="deadline-edit-button btn" data-task-id="${data.task_id}">🗓</button>
-                            <button class="note-edit-button btn" data-task-id="${data.task_id}">✏</button>
-                            <a href="#" class="toggle-task btn" data-task-id="${data.task_id}">${toggleSymbol}</a>
-                            <a href="#" class="delete-task btn btn-danger" data-task-id="${data.task_id}">✕</a>
+                        <div class="task-actions">
+                            <button class="deadline-edit-button btn-action" data-task-id="${data.task_id}" title="Редактировать дедлайн">🗓️</button>
+                            <button class="note-edit-button btn-action" data-task-id="${data.task_id}" title="Редактировать заметку">✏️</button>
+                            <a href="#" class="toggle-task btn-action" data-task-id="${data.task_id}" title="${data.completed ? 'Возобновить' : 'Завершить'}">${data.completed ? '↺' : '✓'}</a>
+                            <a href="#" class="delete-task btn-action btn-action-danger" data-task-id="${data.task_id}" title="Удалить">✕</a>
                         </div>
                     </div>`;
                 document.getElementById(`task-container-${categoryId}`).insertAdjacentHTML('beforeend', newTask);
@@ -167,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                     updateCalendarEvents();
                 }
+                document.getElementById('task-popup').style.display = 'none';
                 this.reset();
             }
         });
@@ -197,6 +232,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 return taskElement && taskElement.closest(`#category-${catId}`) === null;
                             });
                             updateCalendarEvents();
+                            // Удаляем категорию из выпадающего списка
+                            const categorySelect = document.querySelector('select[name="category_id"]');
+                            const optionToRemove = categorySelect.querySelector(`option[value="${catId}"]`);
+                            if (optionToRemove) {
+                                optionToRemove.remove();
+                            }
                         }
                     });
             }
@@ -227,6 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const titleElement = taskElement.querySelector('strong');
                         titleElement.classList.toggle('completed', data.completed);
                         target.textContent = data.completed ? '↺' : '✓';
+                        target.setAttribute('title', data.completed ? 'Возобновить' : 'Завершить');
                         const eventIndex = window.deadlineEvents.findIndex(event => event.id === String(data.task_id));
                         if (eventIndex !== -1) {
                             window.deadlineEvents[eventIndex].color = data.color;
@@ -342,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (deadlineP) {
                         deadlineP.remove();
                         if (existingEventIndex !== -1) {
-                            window.deadlineEvents.splice(existingEventIndex, 1);
+                            window.deadlineEvents.splice(eventIndex, 1);
                         }
                     }
                     document.getElementById(`deadline-form-${taskId}`).style.display = 'none';
