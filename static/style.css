@@ -203,17 +203,29 @@ h2 {
 }
 
 .btn-action {
-    display: flex;
+    display: inline-flex; /* Используем flex для центрирования иконки */
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #e9ecef;
-    color: #495057;
-    text-decoration: none;
-    font-size: 1em;
-    transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+    width: 30px; /* Фиксированная ширина */
+    height: 30px; /* Фиксированная высота */
+    font-size: 16px; /* Размер иконки */
+    line-height: 1; /* Убираем лишние отступы от line-height */
+    padding: 0; /* Убираем внутренние отступы */
+    border-radius: 50%; /* Круглая форма */
+    text-align: center;
+    vertical-align: middle;
+    box-sizing: border-box; /* Учитываем border и padding в размерах */
+    border: 1px solid #ccc; /* Для наглядности границы */
+    background-color: #f0f0f0; /* Фон кнопки */
+    cursor: pointer;
+}
+
+.edit-task-button {
+    transform: none !important; /* Убедимся, что нет трансформаций */
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    -o-transform: none !important;
 }
 
 .btn-action:hover {
@@ -468,4 +480,12 @@ select.input {
         width: 160px;
         font-size: 0.85em;
     }
+}
+
+.normal-orientation {
+    transform: none !important;
+    -webkit-transform: none !important; /* Для совместимости с Webkit-браузерами */
+    -moz-transform: none !important;    /* Для Firefox */
+    -ms-transform: none !important;     /* Для IE */
+    -o-transform: none !important;      /* Для Opera */
 }

@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Server response:', data); // Отладочный лог
+            console.log('Server response:', data);
             if (data.success) {
                 const categoryId = formData.get('category_id');
                 const createdAt = new Date().toLocaleDateString('ru-RU', {
@@ -272,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     year: 'numeric'
                 });
                 let fileListHtml = '';
-                // Проверяем, есть ли file_urls и является ли это строкой
                 if (data.file_urls && typeof data.file_urls === 'string' && data.file_urls.trim() !== '') {
                     console.log('Processing file URLs:', data.file_urls);
                     fileListHtml = '<div class="file-list">';
@@ -363,7 +362,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                     updateCalendarEvents();
                 }
-                // Закрываем модальное окно после успешного добавления
                 const taskPopup = document.getElementById('task-popup');
                 if (taskPopup) {
                     console.log('Closing task popup after adding task');
@@ -374,7 +372,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.reset();
             } else {
                 console.error('Failed to add task:', data);
-                // Пытаемся закрыть окно даже в случае ошибки
                 const taskPopup = document.getElementById('task-popup');
                 if (taskPopup) {
                     console.log('Closing task popup after error');
@@ -384,7 +381,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error adding task:', error);
-            // Пытаемся закрыть окно даже в случае ошибки
             const taskPopup = document.getElementById('task-popup');
             if (taskPopup) {
                 console.log('Closing task popup after error');
@@ -529,7 +525,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? taskElement.querySelector('p').textContent
                         : `Создано: ${new Date().toLocaleDateString('ru-RU')}`;
 
-                    // Пересоздаём весь task-item для полной синхронизации
                     let fileListHtml = '';
                     if (data.file_urls && typeof data.file_urls === 'string' && data.file_urls.trim() !== '') {
                         fileListHtml = '<div class="file-list">';
@@ -594,12 +589,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         flatpickr(newDeadlineInput, { dateFormat: "d.m.Y", locale: "ru" });
                     }
 
-                    // Заново находим элементы после пересоздания DOM
                     const updatedEditForm = document.getElementById(`edit-task-form-${taskId}`);
                     const updatedTaskDisplay = document.getElementById(`task-display-${taskId}`);
                     const editButton = document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`);
 
-                    // Устанавливаем видимость
                     if (updatedEditForm && updatedTaskDisplay) {
                         console.log('Hiding edit form and showing task display after edit');
                         updatedEditForm.style.display = 'none';
@@ -608,10 +601,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.error('Edit form or task display not found after update!');
                     }
                     if (editButton) {
-                        editButton.style.display = 'inline-block';
+                        editButton.style.display = 'inline-flex'; // Устанавливаем flex для правильного отображения
+                        editButton.style.width = '30px'; // Фиксируем размеры
+                        editButton.style.height = '30px';
+                        editButton.style.fontSize = '16px'; // Контролируем размер иконки
+                        editButton.style.lineHeight = '1'; // Убираем лишние отступы
                     }
 
-                    // Обновляем календарь
                     const existingEventIndex = window.deadlineEvents.findIndex(event => event.id === taskId);
                     if (data.deadline) {
                         const deadlineDate = data.deadline;
