@@ -15,7 +15,10 @@
     <div class="container">
         <h1>Список задач</h1>
 
-        <div id="calendar"></div>
+        <div class="calendar-wrapper">
+            <div class="calendar-toggle" title="Свернуть/развернуть календарь">🔽</div>
+            <div id="calendar" class="calendar-expanded"></div>
+        </div>
 
         {% for cat in categories %}
             <div class="category" id="category-{{ cat.id }}" draggable="true">

@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
     let calendar;
     if (calendarEl) {
+        console.log('Initializing calendar...'); // Отладка
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             height: 'auto',
@@ -21,7 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+        console.log('Rendering calendar...'); // Отладка
         calendar.render();
+    } else {
+        console.error('Calendar element not found!'); // Отладка
     }
 
     // Синхронизация существующих задач с дедлайнами
@@ -85,11 +89,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         category.addEventListener('dragend', () => {
             category.classList.remove('dragging');
-            // Собираем новый порядок категорий
             const newOrder = Array.from(container.querySelectorAll('.category')).map(cat => cat.id.split('-')[1]);
-            console.log('New order:', newOrder); // Отладка: проверяем порядок
+            console.log('New order:', newOrder);
 
-            // Формируем FormData правильно
             const formData = new FormData();
             newOrder.forEach(id => formData.append('order[]', id));
 
@@ -134,6 +136,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 return closest;
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Сворачивание/разворачивание календаря
+    const calendarToggle = document.querySelector('.calendar-toggle');
+    const calendarElement = document.getElementById('calendar');
+    if (calendarToggle && calendarElement) {
+        calendarToggle.addEventListener('click', function () {
+            const isCollapsed = calendarElement.classList.toggle('collapsed');
+            calendarElement.classList.toggle('calendar-expanded', !isCollapsed);
+            calendarToggle.textContent = isCollapsed ? '🔼' : '🔽';
+            if (!isCollapsed && calendar) {
+                console.log('Re-rendering calendar after expanding...'); // Отладка
+                calendar.render(); // Перерисовываем календарь при разворачивании
+            }
+        });
+    } else {
+        console.error('Calendar toggle or calendar element not found!'); // Отладка
     }
 
     // Открытие и закрытие попапов
@@ -345,7 +364,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 return taskElement && taskElement.closest(`#category-${catId}`) === null;
                             });
                             updateCalendarEvents();
-                            // Удаляем категорию из выпадающего списка
                             const categorySelect = document.querySelector('select[name="category_id"]');
                             const optionToRemove = categorySelect.querySelector(`option[value="${catId}"]`);
                             if (optionToRemove) {
@@ -497,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (deadlineP) {
                         deadlineP.remove();
                         if (existingEventIndex !== -1) {
-                            window.deadlineEvents.splice(eventIndex, 1);
+                            window.deadlineEvents.splice(existingEventIndex, 1);
                         }
                     }
                     document.getElementById(`deadline-form-${taskId}`).style.display = 'none';

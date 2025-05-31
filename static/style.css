@@ -14,16 +14,44 @@ body {
 }
 
 /* Календарь в правом верхнем углу */
-#calendar {
+.calendar-wrapper {
     position: fixed;
     top: 20px;
     right: 20px;
     width: 300px;
+    z-index: 1000;
+}
+
+.calendar-toggle {
+    display: flex;
+    justify-content: flex-end;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#calendar {
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 10px;
-    z-index: 1000;
+    transition: height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+}
+
+#calendar.collapsed {
+    height: 0;
+    padding: 0;
+    opacity: 0;
+    border-radius: 0;
+}
+
+#calendar.calendar-expanded {
+    height: auto;
+    opacity: 1;
 }
 
 #calendar .fc {
@@ -212,10 +240,10 @@ h2 {
 
 .create-buttons .btn {
     padding: 10px 20px;
-    width: 180px; /* Увеличиваем ширину, чтобы текст помещался */
+    width: 180px;
     text-align: center;
     border-radius: 6px;
-    white-space: nowrap; /* Запрещаем перенос текста */
+    white-space: nowrap;
 }
 
 /* Стили для попапов */
@@ -376,4 +404,37 @@ select.input {
 
 .d-none {
     display: none;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .calendar-wrapper {
+        top: 10px; /* Поднимаем календарь выше */
+        right: 10px;
+        width: 250px;
+        border-radius: 12px; /* Скругляем углы всего блока */
+        overflow: hidden; /* Убедимся, что содержимое не выходит за скругленные углы */
+    }
+
+    .calendar-toggle {
+        border-radius: 12px 12px 0 0; /* Скругляем углы кнопки сверху */
+    }
+
+    #calendar {
+        border-radius: 0 0 12px 12px; /* Скругляем углы календаря снизу */
+    }
+
+    #calendar.collapsed {
+        border-radius: 0; /* Убираем скругление при сворачивании */
+    }
+
+    .create-buttons {
+        top: 10px;
+        left: 10px;
+    }
+
+    .create-buttons .btn {
+        width: 160px;
+        font-size: 0.85em;
+    }
 }
