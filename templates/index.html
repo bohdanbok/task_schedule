@@ -1,107 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>Список задач</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список задач</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
-  <div class="container mt-4">
-    <h1>Список задач</h1>
+    <div class="container">
+        <h1>Список задач</h1>
 
-    <!-- Категории -->
-    <h2 class="mt-4">Категории</h2>
-    <form method="post" action="{{ url_for('main.add_category') }}" class="mb-3">
-      <div class="input-group">
-        <input name="category_name" type="text" class="form-control" placeholder="Новая категория..." required>
-        <button class="btn btn-secondary">Добавить категорию</button>
-      </div>
-    </form>
+        <div id="calendar"></div>
 
-    <!-- Добавление задачи -->
-    <h2 class="mt-4">Добавить задачу</h2>
-    <form method="post" action="{{ url_for('main.add_task') }}" class="mb-3">
-      <div class="row g-2 mb-2">
-        <div class="col">
-          <input name="title" type="text" class="form-control" placeholder="Заголовок задачи..." required>
-        </div>
-        <div class="col">
-          <select name="category_id" class="form-select" required>
-            <option value="" disabled selected>Выберите категорию</option>
-            {% for cat in categories %}
-              <option value="{{ cat.id }}">{{ cat.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-      <textarea name="note" class="form-control mb-2" placeholder="Заметка (необязательно)"></textarea>
-      <input name="deadline" type="text" class="form-control mb-2" placeholder="дд.мм.гггг">
-      <button class="btn btn-primary">Добавить</button>
-    </form>
+        <h2>Категории</h2>
+        <form id="add-category-form">
+            <input type="text" name="category_name" placeholder="Добавить категорию" class="input">
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
 
-    <!-- Список задач -->
-    {% for cat in categories %}
-      <h3 class="mt-4">{{ cat.name }}
-        <a href="{{ url_for('main.delete_category', cat_id=cat.id) }}" class="btn btn-sm btn-outline-danger ms-2">✕</a>
-      </h3>
-      <ul class="list-group mb-3">
-        {% for task in tasks_by_cat[cat.id] %}
-          <li class="list-group-item">
-            <div class="d-flex justify-content-between">
-              <div style="width: 100%;">
-                <strong class="{{ 'text-decoration-line-through' if task.completed }}">{{ task.title }}</strong>
-                {% if task.note %}<div id="note-display-{{ task.id }}" class="text-muted small">{{ task.note }}</div>{% endif %}
-                {% if task.deadline %}<div id="deadline-display-{{ task.id }}" class="text-danger small">До: {{ task.deadline.strftime('%d.%m.%Y') }}</div>{% endif %}
-                <div class="text-muted small">Создано: {{ task.created_at.strftime('%d.%m.%Y') }}</div>
+        <h2>Добавить задачу</h2>
+        <form id="add-task-form" class="form-flex">
+            <input type="text" name="title" placeholder="Название задачи" class="input">
+            <textarea name="note" placeholder="Заметка" class="input"></textarea>
+            <input type="text" name="deadline" placeholder="Дедлайн (ДД.ММ.ГГГГ)" class="input">
+            <select name="category_id" class="input">
+                <option value="">Выберите категорию</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
 
-                <!-- Форма редактирования заметки -->
-                <form method="post" action="{{ url_for('main.edit_note', task_id=task.id) }}" class="note-edit-form mt-2" id="note-form-{{ task.id }}" style="display: none;">
-                  <div class="input-group input-group-sm">
-                    <input name="new_note" type="text" class="form-control" value="{{ task.note or '' }}">
-                    <button class="btn btn-outline-primary">💾</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="toggleEdit({{ task.id }}, false)">Отмена</button>
-                  </div>
-                </form>
-
-                <!-- Форма редактирования дедлайна -->
-                <form method="post" action="{{ url_for('main.edit_deadline', task_id=task.id) }}" class="deadline-edit-form mt-1" id="deadline-form-{{ task.id }}" style="display: none;">
-                  <div class="input-group input-group-sm" style="max-width: 220px;">
-                    <input name="new_deadline" type="text" class="form-control" value="{{ task.deadline.strftime('%d.%m.%Y') if task.deadline else '' }}">
-                    <button class="btn btn-outline-primary">💾</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="toggleDeadlineEdit({{ task.id }}, false)">Отмена</button>
-                  </div>
-                </form>
-              </div>
-
-              <!-- Кнопки действий -->
-              <div class="d-flex align-items-start gap-1 ms-2 flex-shrink-0">
-                <a href="#" onclick="toggleEdit({{ task.id }}, true)" class="btn btn-sm btn-outline-warning">✏</a>
-                <a href="#" onclick="toggleDeadlineEdit({{ task.id }}, true)" class="btn btn-sm btn-outline-info">📅</a>
-                <a href="{{ url_for('main.toggle_task', task_id=task.id) }}" class="btn btn-sm btn-outline-success">{% if task.completed %}↺{% else %}✓{% endif %}</a>
-                <a href="{{ url_for('main.delete_task', task_id=task.id) }}" class="btn btn-sm btn-outline-danger">✕</a>
-              </div>
+        {% for cat in categories %}
+            <div class="category" id="category-{{ cat.id }}">
+                <h3 class="category-header">
+                    {{ cat.name }}
+                    <div class="button-group">
+                        <button class="toggle-tasks btn" data-cat-id="{{ cat.id }}">🔽</button>
+                        <a href="#" class="delete-category btn btn-danger" data-cat-id="{{ cat.id }}">✕</a>
+                    </div>
+                </h3>
+                <div id="task-container-{{ cat.id }}" class="task-container">
+                    {% for task in tasks_by_cat[cat.id] %}
+                        <div class="task-item" id="task-{{ task.id }}" data-task-id="{{ task.id }}">
+                            <div id="note-display-{{ task.id }}">
+                                <strong class="{{ 'completed' if task.completed else '' }}">{{ task.title }}</strong>
+                                {% if task.note %}
+                                    <p>{{ task.note }}</p>
+                                {% endif %}
+                                {% if task.deadline %}
+                                    <p>До: {{ task.deadline.strftime('%d.%m.%Y') }}</p>
+                                {% endif %}
+                                <p>Создано: {{ task.created_at.strftime('%d.%m.%Y') }}</p>
+                            </div>
+                            <form id="note-form-{{ task.id }}" class="edit-form edit-note-form" style="display: none;">
+                                <textarea name="new_note" class="input" placeholder="Введите заметку">{{ task.note or '' }}</textarea>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-save">💾</button>
+                                    <button type="button" class="cancel-note-edit btn" data-task-id="{{ task.id }}">Отмена</button>
+                                </div>
+                            </form>
+                            <div id="deadline-form-{{ task.id }}" class="edit-form" style="display: none;">
+                                <form class="edit-deadline-form form-flex">
+                                    <input type="text" name="new_deadline" value="{% if task.deadline %}{{ task.deadline.strftime('%d.%m.%Y') }}{% endif %}" placeholder="ДД.ММ.ГГГГ" class="input">
+                                    <button type="submit" class="btn btn-save">💾</button>
+                                    <button type="button" class="cancel-deadline-edit btn" data-task-id="{{ task.id }}">Отмена</button>
+                                </form>
+                            </div>
+                            <div class="button-group">
+                                <button class="deadline-edit-button btn" data-task-id="{{ task.id }}">🗓</button>
+                                <button class="note-edit-button btn" data-task-id="{{ task.id }}">✏</button>
+                                <a href="#" class="toggle-task btn" data-task-id="{{ task.id }}">{% if task.completed %}↺{% else %}✓{% endif %}</a>
+                                <a href="#" class="delete-task btn btn-danger" data-task-id="{{ task.id }}">✕</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if not tasks_by_cat[cat.id] %}
+                        <p>Задачи отсутствуют</p>
+                    {% endif %}
+                </div>
             </div>
-          </li>
         {% endfor %}
-        {% if not tasks_by_cat[cat.id] %}
-          <li class="list-group-item text-muted">Задачи отсутствуют</li>
-        {% endif %}
-      </ul>
-    {% endfor %}
-  </div>
-
-  <!-- Календарь -->
-  <div id="calendar"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
-  <script>
-    window.deadlineEvents = {{ deadline_events|tojson }};
-  </script>
+    </div>
+    <script>
+        window.deadlineEvents = {{ deadline_events|tojson|safe }};
+    </script>
 </body>
 </html>
