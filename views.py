@@ -6,7 +6,7 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    categories = Category.query.all()
+    categories = Category.query.order_by(Category.position.asc()).all()
     tasks_by_cat = {}
     for cat in categories:
         tasks_by_cat[cat.id] = Task.query.filter_by(category_id=cat.id).order_by(Task.created_at.desc()).all()
@@ -29,13 +29,35 @@ def index():
 @main.route('/add_category', methods=['POST'])
 def add_category():
     category_name = request.form.get('category_name')
-    category_color = request.form.get('category_color', '#ffffff')  # По умолчанию белый
+    category_color = request.form.get('category_color', '#ffffff')
     if category_name:
-        new_category = Category(name=category_name, color=category_color)
+        # Найдём максимальную позицию и добавим категорию в конец
+        max_position = db.session.query(db.func.max(Category.position)).scalar() or 0
+        new_category = Category(name=category_name, color=category_color, position=max_position + 1)
         db.session.add(new_category)
         db.session.commit()
         return jsonify({'success': True, 'category_id': new_category.id})
     return jsonify({'success': False, 'message': 'Category name is required'})
+
+@main.route('/edit_category_color/<int:cat_id>', methods=['POST'])
+def edit_category_color(cat_id):
+    category = Category.query.get_or_404(cat_id)
+    new_color = request.form.get('category_color')
+    if new_color:
+        category.color = new_color
+        db.session.commit()
+        return jsonify({'success': True, 'color': new_color})
+    return jsonify({'success': False, 'message': 'Color is required'})
+
+@main.route('/update_category_order', methods=['POST'])
+def update_category_order():
+    order = request.form.getlist('order[]')  # Получаем список ID категорий в новом порядке
+    for index, cat_id in enumerate(order):
+        category = Category.query.get(int(cat_id))
+        if category:
+            category.position = index
+    db.session.commit()
+    return jsonify({'success': True})
 
 @main.route('/delete_category/<int:cat_id>')
 def delete_category(cat_id):

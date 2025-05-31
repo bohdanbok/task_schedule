@@ -74,6 +74,57 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Drag-and-Drop для категорий
+    const categories = document.querySelectorAll('.category');
+    const container = document.querySelector('.container');
+
+    categories.forEach(category => {
+        category.addEventListener('dragstart', () => {
+            category.classList.add('dragging');
+        });
+
+        category.addEventListener('dragend', () => {
+            category.classList.remove('dragging');
+            // Собираем новый порядок категорий
+            const newOrder = Array.from(container.querySelectorAll('.category')).map(cat => cat.id.split('-')[1]);
+            fetch('/update_category_order', {
+                method: 'POST',
+                body: new FormData().append('order[]', newOrder),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update category order');
+                }
+            });
+        });
+    });
+
+    container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        const dragging = document.querySelector('.dragging');
+        if (afterElement == null) {
+            container.appendChild(dragging);
+        } else {
+            container.insertBefore(dragging, afterElement);
+        }
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.category:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
     // Открытие и закрытие попапов
     document.getElementById('create-category-btn')?.addEventListener('click', function () {
         document.getElementById('category-popup').style.display = 'flex';
@@ -93,6 +144,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('add-task-form').reset();
     });
 
+    document.getElementById('cancel-edit-color-btn')?.addEventListener('click', function () {
+        document.getElementById('edit-color-popup').style.display = 'none';
+        document.getElementById('edit-color-form').reset();
+    });
+
     // Добавление категории
     document.getElementById('add-category-form')?.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -107,10 +163,11 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 const newCategory = `
-                    <div class="category" id="category-${data.category_id}">
+                    <div class="category" id="category-${data.category_id}" draggable="true">
                         <h3 class="category-header" style="background-color: ${color};">
                             ${formData.get('category_name')}
                             <div class="button-group">
+                                <button class="edit-category-color btn" data-cat-id="${data.category_id}" title="Изменить цвет">🎨</button>
                                 <button class="toggle-tasks btn" data-cat-id="${data.category_id}">🔽</button>
                                 <a href="#" class="delete-category btn btn-danger" data-cat-id="${data.category_id}">✕</a>
                             </div>
@@ -129,6 +186,50 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Редактирование цвета категории
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('edit-category-color')) {
+            const catId = e.target.getAttribute('data-cat-id');
+            const categoryHeader = document.querySelector(`#category-${catId} .category-header`);
+            const currentColor = categoryHeader.style.backgroundColor || '#ffffff';
+            const colorInput = document.querySelector('#edit-color-form input[name="category_color"]');
+            colorInput.value = rgbToHex(currentColor);
+            document.getElementById('edit-color-popup').style.display = 'flex';
+            document.getElementById('edit-color-form').dataset.catId = catId;
+        }
+    });
+
+    document.getElementById('edit-color-form')?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const catId = this.dataset.catId;
+        const formData = new FormData(this);
+        fetch(`/edit_category_color/${catId}`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const categoryHeader = document.querySelector(`#category-${catId} .category-header`);
+                categoryHeader.style.backgroundColor = data.color;
+                document.getElementById('edit-color-popup').style.display = 'none';
+                this.reset();
+            }
+        });
+    });
+
+    // Функция для конвертации RGB в HEX
+    function rgbToHex(rgb) {
+        if (rgb.startsWith('#')) return rgb;
+        const rgbValues = rgb.match(/\d+/g);
+        if (!rgbValues) return '#ffffff';
+        const r = parseInt(rgbValues[0]).toString(16).padStart(2, '0');
+        const g = parseInt(rgbValues[1]).toString(16).padStart(2, '0');
+        const b = parseInt(rgbValues[2]).toString(16).padStart(2, '0');
+        return `#${r}${g}${b}`;
+    }
 
     // Добавление задачи
     document.getElementById('add-task-form')?.addEventListener('submit', function (e) {

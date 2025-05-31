@@ -5,7 +5,8 @@ db = SQLAlchemy()
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    color = db.Column(db.String(7), default='#ffffff')  # HEX-код цвета, по умолчанию белый
+    color = db.Column(db.String(7), default='#ffffff')  # HEX-код цвета
+    position = db.Column(db.Integer, default=0)  # Поле для порядка категорий
     tasks = db.relationship('Task', backref='category', lazy=True, cascade="all, delete-orphan")
 
 class Task(db.Model):

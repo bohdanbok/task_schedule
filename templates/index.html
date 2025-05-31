@@ -18,10 +18,11 @@
         <div id="calendar"></div>
 
         {% for cat in categories %}
-            <div class="category" id="category-{{ cat.id }}">
+            <div class="category" id="category-{{ cat.id }}" draggable="true">
                 <h3 class="category-header" style="background-color: {{ cat.color }};">
                     {{ cat.name }}
                     <div class="button-group">
+                        <button class="edit-category-color btn" data-cat-id="{{ cat.id }}" title="Изменить цвет">🎨</button>
                         <button class="toggle-tasks btn" data-cat-id="{{ cat.id }}">🔽</button>
                         <a href="#" class="delete-category btn btn-danger" data-cat-id="{{ cat.id }}">✕</a>
                     </div>
@@ -101,6 +102,23 @@
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Добавить</button>
                     <button type="button" class="btn btn-cancel" id="cancel-category-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Попап для редактирования цвета категории -->
+    <div id="edit-color-popup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h3>Изменить цвет категории</h3>
+            <form id="edit-color-form" class="popup-form">
+                <div class="input-group">
+                    <span class="input-icon">🎨</span>
+                    <input type="color" name="category_color" value="#ffffff" class="input color-picker">
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <button type="button" class="btn btn-cancel" id="cancel-edit-color-btn">Отмена</button>
                 </div>
             </form>
         </div>
