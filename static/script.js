@@ -87,16 +87,27 @@ document.addEventListener('DOMContentLoaded', function () {
             category.classList.remove('dragging');
             // Собираем новый порядок категорий
             const newOrder = Array.from(container.querySelectorAll('.category')).map(cat => cat.id.split('-')[1]);
+            console.log('New order:', newOrder); // Отладка: проверяем порядок
+
+            // Формируем FormData правильно
+            const formData = new FormData();
+            newOrder.forEach(id => formData.append('order[]', id));
+
             fetch('/update_category_order', {
                 method: 'POST',
-                body: new FormData().append('order[]', newOrder),
+                body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => response.json())
             .then(data => {
-                if (!data.success) {
-                    console.error('Failed to update category order');
+                if (data.success) {
+                    console.log('Category order updated successfully');
+                } else {
+                    console.error('Failed to update category order:', data);
                 }
+            })
+            .catch(error => {
+                console.error('Error updating category order:', error);
             });
         });
     });

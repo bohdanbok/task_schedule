@@ -52,10 +52,15 @@ def edit_category_color(cat_id):
 @main.route('/update_category_order', methods=['POST'])
 def update_category_order():
     order = request.form.getlist('order[]')  # Получаем список ID категорий в новом порядке
+    print('Received order:', order)  # Отладка: проверяем, что получили
+    if not order:
+        return jsonify({'success': False, 'message': 'No order provided'})
+
     for index, cat_id in enumerate(order):
         category = Category.query.get(int(cat_id))
         if category:
             category.position = index
+            print(f'Updated category {cat_id} to position {index}')  # Отладка
     db.session.commit()
     return jsonify({'success': True})
 
