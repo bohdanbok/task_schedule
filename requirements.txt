@@ -41,7 +41,7 @@ prompt_toolkit==3.0.51
 pytest==8.3.5
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
-python-telegram-bot==13.7
+python-telegram-bot==22.1
 pytz==2025.2
 redis==4.5.5
 six==1.17.0
