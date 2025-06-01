@@ -152,26 +152,54 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.getElementById('create-category-btn')?.addEventListener('click', function () {
-        document.getElementById('category-popup').style.display = 'flex';
+        const popup = document.getElementById('category-popup');
+        if (popup) {
+            popup.style.display = 'flex';
+        } else {
+            console.error('Category popup not found!');
+        }
     });
 
     document.getElementById('create-task-btn')?.addEventListener('click', function () {
-        document.getElementById('task-popup').style.display = 'flex';
+        const popup = document.getElementById('task-popup');
+        if (popup) {
+            popup.style.display = 'flex';
+        } else {
+            console.error('Task popup not found!');
+        }
     });
 
     document.getElementById('cancel-category-btn')?.addEventListener('click', function () {
-        document.getElementById('category-popup').style.display = 'none';
-        document.getElementById('add-category-form').reset();
+        const popup = document.getElementById('category-popup');
+        const form = document.getElementById('add-category-form');
+        if (popup && form) {
+            popup.style.display = 'none';
+            form.reset();
+        } else {
+            console.error('Category popup or form not found!');
+        }
     });
 
     document.getElementById('cancel-task-btn')?.addEventListener('click', function () {
-        document.getElementById('task-popup').style.display = 'none';
-        document.getElementById('add-task-form').reset();
+        const popup = document.getElementById('task-popup');
+        const form = document.getElementById('add-task-form');
+        if (popup && form) {
+            popup.style.display = 'none';
+            form.reset();
+        } else {
+            console.error('Task popup or form not found!');
+        }
     });
 
     document.getElementById('cancel-edit-color-btn')?.addEventListener('click', function () {
-        document.getElementById('edit-color-popup').style.display = 'none';
-        document.getElementById('edit-color-form').reset();
+        const popup = document.getElementById('edit-color-popup');
+        const form = document.getElementById('edit-color-form');
+        if (popup && form) {
+            popup.style.display = 'none';
+            form.reset();
+        } else {
+            console.error('Edit color popup or form not found!');
+        }
     });
 
     document.getElementById('add-category-form')?.addEventListener('submit', function (e) {
@@ -199,15 +227,29 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div id="task-container-${data.category_id}" class="task-container"></div>
                     </div>`;
                 const container = document.querySelector('.container');
-                container.insertAdjacentHTML('beforeend', newCategory);
-                const categorySelect = document.querySelector('select[name="category_id"]');
-                const newOption = document.createElement('option');
-                newOption.value = data.category_id;
-                newOption.textContent = formData.get('category_name');
-                categorySelect.appendChild(newOption);
-                document.getElementById('category-popup').style.display = 'none';
-                this.reset();
+                if (container) {
+                    container.insertAdjacentHTML('beforeend', newCategory);
+                    const categorySelect = document.querySelector('select[name="category_id"]');
+                    if (categorySelect) {
+                        const newOption = document.createElement('option');
+                        newOption.value = data.category_id;
+                        newOption.textContent = formData.get('category_name');
+                        categorySelect.appendChild(newOption);
+                    }
+                    const popup = document.getElementById('category-popup');
+                    if (popup) {
+                        popup.style.display = 'none';
+                    }
+                    this.reset();
+                } else {
+                    console.error('Container not found!');
+                }
+            } else {
+                console.error('Failed to add category:', data);
             }
+        })
+        .catch(error => {
+            console.error('Error adding category:', error);
         });
     });
 
@@ -215,11 +257,21 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.target.classList.contains('edit-category-color')) {
             const catId = e.target.getAttribute('data-cat-id');
             const categoryHeader = document.querySelector(`#category-${catId} .category-header`);
-            const currentColor = categoryHeader.style.backgroundColor || '#ffffff';
-            const colorInput = document.querySelector('#edit-color-form input[name="category_color"]');
-            colorInput.value = rgbToHex(currentColor);
-            document.getElementById('edit-color-popup').style.display = 'flex';
-            document.getElementById('edit-color-form').dataset.catId = catId;
+            if (categoryHeader) {
+                const currentColor = categoryHeader.style.backgroundColor || '#ffffff';
+                const colorInput = document.querySelector('#edit-color-form input[name="category_color"]');
+                if (colorInput) {
+                    colorInput.value = rgbToHex(currentColor);
+                    const popup = document.getElementById('edit-color-popup');
+                    if (popup) {
+                        popup.style.display = 'flex';
+                        const form = document.getElementById('edit-color-form');
+                        if (form) {
+                            form.dataset.catId = catId;
+                        }
+                    }
+                }
+            }
         }
     });
 
@@ -236,10 +288,18 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 const categoryHeader = document.querySelector(`#category-${catId} .category-header`);
-                categoryHeader.style.backgroundColor = data.color;
-                document.getElementById('edit-color-popup').style.display = 'none';
-                this.reset();
+                if (categoryHeader) {
+                    categoryHeader.style.backgroundColor = data.color;
+                    const popup = document.getElementById('edit-color-popup');
+                    if (popup) {
+                        popup.style.display = 'none';
+                    }
+                    this.reset();
+                }
             }
+        })
+        .catch(error => {
+            console.error('Error editing category color:', error);
         });
     });
 
@@ -394,7 +454,12 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const catId = e.target.getAttribute('data-cat-id');
             const container = document.getElementById(`task-container-${catId}`);
-            if (container) container.classList.toggle('d-none');
+            if (container) {
+                container.classList.toggle('d-none');
+                e.target.textContent = container.classList.contains('d-none') ? '🔼' : '🔽';
+            } else {
+                console.error(`Task container for category ${catId} not found!`);
+            }
         }
 
         if (e.target.classList.contains('delete-category')) {
@@ -405,7 +470,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            document.getElementById(`category-${catId}`).remove();
+                            const categoryElement = document.getElementById(`category-${catId}`);
+                            if (categoryElement) {
+                                categoryElement.remove();
+                            }
                             window.deadlineEvents = window.deadlineEvents.filter(event => {
                                 const taskElement = document.getElementById(`task-${event.id}`);
                                 return taskElement && taskElement.closest(`#category-${catId}`) === null;
@@ -416,23 +484,45 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (optionToRemove) {
                                 optionToRemove.remove();
                             }
+                        } else {
+                            console.error('Failed to delete category:', data);
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting category:', error);
                     });
             }
         }
 
         if (e.target.classList.contains('edit-task-button')) {
             const taskId = e.target.getAttribute('data-task-id');
-            document.getElementById(`edit-task-form-${taskId}`).style.display = 'block';
-            document.getElementById(`task-display-${taskId}`).style.display = 'none';
-            e.target.style.display = 'none';
+            const editForm = document.getElementById(`edit-task-form-${taskId}`);
+            const taskDisplay = document.getElementById(`task-display-${taskId}`);
+            if (editForm && taskDisplay) {
+                editForm.style.display = 'block';
+                taskDisplay.style.display = 'none';
+                e.target.style.display = 'none';
+            } else {
+                console.error(`Edit form or task display not found for task ${taskId}`);
+            }
         }
 
         if (e.target.classList.contains('cancel-edit')) {
             const taskId = e.target.getAttribute('data-task-id');
-            document.getElementById(`edit-task-form-${taskId}`).style.display = 'none';
-            document.getElementById(`task-display-${taskId}`).style.display = 'block';
-            document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`).style.display = 'inline-block';
+            const editForm = document.getElementById(`edit-task-form-${taskId}`);
+            const taskDisplay = document.getElementById(`task-display-${taskId}`);
+            const editButton = document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`);
+            if (editForm && taskDisplay && editButton) {
+                editForm.style.display = 'none';
+                taskDisplay.style.display = 'block';
+                editButton.style.display = 'inline-flex';
+                editButton.style.width = '30px';
+                editButton.style.height = '30px';
+                editButton.style.fontSize = '16px';
+                editButton.style.lineHeight = '1';
+            } else {
+                console.error(`Edit form, task display, or edit button not found for task ${taskId}`);
+            }
         }
 
         if (e.target.classList.contains('toggle-task')) {
@@ -443,17 +533,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.success) {
                         const taskElement = document.getElementById(`task-${taskId}`);
-                        const titleElement = taskElement.querySelector('strong');
-                        titleElement.classList.toggle('completed', data.completed);
-                        e.target.textContent = data.completed ? '↺' : '✓';
-                        e.target.setAttribute('title', data.completed ? 'Возобновить' : 'Завершить');
-                        const eventIndex = window.deadlineEvents.findIndex(event => event.id === String(data.task_id));
-                        if (eventIndex !== -1) {
-                            window.deadlineEvents[eventIndex].color = data.color;
-                            window.deadlineEvents[eventIndex].completed = data.completed;
+                        if (taskElement) {
+                            const titleElement = taskElement.querySelector('strong');
+                            if (titleElement) {
+                                titleElement.classList.toggle('completed', data.completed);
+                            }
+                            e.target.textContent = data.completed ? '↺' : '✓';
+                            e.target.setAttribute('title', data.completed ? 'Возобновить' : 'Завершить');
+                            const eventIndex = window.deadlineEvents.findIndex(event => event.id === String(data.task_id));
+                            if (eventIndex !== -1) {
+                                window.deadlineEvents[eventIndex].color = data.color;
+                                window.deadlineEvents[eventIndex].completed = data.completed;
+                            }
+                            updateCalendarEvents();
+                        } else {
+                            console.error(`Task element ${taskId} not found`);
                         }
-                        updateCalendarEvents();
+                    } else {
+                        console.error('Failed to toggle task:', data);
                     }
+                })
+                .catch(error => {
+                    console.error('Error toggling task:', error);
                 });
         }
 
@@ -465,13 +566,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            document.getElementById(`task-${taskId}`).remove();
+                            const taskElement = document.getElementById(`task-${taskId}`);
+                            if (taskElement) {
+                                taskElement.remove();
+                            }
                             const eventIndex = window.deadlineEvents.findIndex(event => event.id === String(data.task_id));
                             if (eventIndex !== -1) {
                                 window.deadlineEvents.splice(eventIndex, 1);
                             }
                             updateCalendarEvents();
+                        } else {
+                            console.error('Failed to delete task:', data);
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting task:', error);
                     });
             }
         }
@@ -480,8 +589,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const fullUrl = e.target.closest('.task-image').getAttribute('data-full-url');
             const modal = document.getElementById('image-modal');
             const modalImage = document.getElementById('modal-image');
-            modalImage.src = fullUrl;
-            modal.style.display = 'flex';
+            if (modal && modalImage) {
+                modalImage.src = fullUrl;
+                modal.style.display = 'flex';
+            }
         }
 
         if (e.target.closest('.file-link')) {
@@ -491,19 +602,25 @@ document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('document-modal');
             const documentName = document.getElementById('document-name');
             const documentDownload = document.getElementById('document-download');
-            documentName.textContent = filename;
-            documentDownload.href = fileUrl;
-            modal.style.display = 'flex';
+            if (modal && documentName && documentDownload) {
+                documentName.textContent = filename;
+                documentDownload.href = fileUrl;
+                modal.style.display = 'flex';
+            }
         }
 
         if (e.target.classList.contains('modal-close')) {
             const modal = document.getElementById('image-modal');
-            modal.style.display = 'none';
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
 
         if (e.target.classList.contains('document-modal-close')) {
             const modal = document.getElementById('document-modal');
-            modal.style.display = 'none';
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
     });
 
@@ -583,52 +700,56 @@ document.addEventListener('DOMContentLoaded', function () {
                             <a href="#" class="delete-task btn-action btn-action-danger" data-task-id="${taskId}" title="Удалить">✕</a>
                         </div>`;
 
-                    taskElement.innerHTML = newTaskHtml;
-                    const newDeadlineInput = taskElement.querySelector(`#edit-task-form-${taskId} .deadline-input`);
-                    if (newDeadlineInput) {
-                        flatpickr(newDeadlineInput, { dateFormat: "d.m.Y", locale: "ru" });
-                    }
-
-                    const updatedEditForm = document.getElementById(`edit-task-form-${taskId}`);
-                    const updatedTaskDisplay = document.getElementById(`task-display-${taskId}`);
-                    const editButton = document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`);
-
-                    if (updatedEditForm && updatedTaskDisplay) {
-                        console.log('Hiding edit form and showing task display after edit');
-                        updatedEditForm.style.display = 'none';
-                        updatedTaskDisplay.style.display = 'block';
-                    } else {
-                        console.error('Edit form or task display not found after update!');
-                    }
-                    if (editButton) {
-                        editButton.style.display = 'inline-flex'; // Устанавливаем flex для правильного отображения
-                        editButton.style.width = '30px'; // Фиксируем размеры
-                        editButton.style.height = '30px';
-                        editButton.style.fontSize = '16px'; // Контролируем размер иконки
-                        editButton.style.lineHeight = '1'; // Убираем лишние отступы
-                    }
-
-                    const existingEventIndex = window.deadlineEvents.findIndex(event => event.id === taskId);
-                    if (data.deadline) {
-                        const deadlineDate = data.deadline;
-                        if (existingEventIndex !== -1) {
-                            window.deadlineEvents[existingEventIndex].start = deadlineDate;
-                            window.deadlineEvents[existingEventIndex].title = data.title;
-                            window.deadlineEvents[existingEventIndex].completed = data.completed;
-                        } else {
-                            window.deadlineEvents.push({
-                                id: taskId,
-                                title: data.title,
-                                start: deadlineDate,
-                                color: data.completed ? '#6c757d' : '#dc3545',
-                                completed: data.completed
-                            });
+                    if (taskElement) {
+                        taskElement.innerHTML = newTaskHtml;
+                        const newDeadlineInput = taskElement.querySelector(`#edit-task-form-${taskId} .deadline-input`);
+                        if (newDeadlineInput) {
+                            flatpickr(newDeadlineInput, { dateFormat: "d.m.Y", locale: "ru" });
                         }
-                    } else if (existingEventIndex !== -1) {
-                        window.deadlineEvents.splice(existingEventIndex, 1);
-                    }
 
-                    updateCalendarEvents();
+                        const updatedEditForm = document.getElementById(`edit-task-form-${taskId}`);
+                        const updatedTaskDisplay = document.getElementById(`task-display-${taskId}`);
+                        const editButton = document.querySelector(`.edit-task-button[data-task-id="${taskId}"]`);
+
+                        if (updatedEditForm && updatedTaskDisplay) {
+                            console.log('Hiding edit form and showing task display after edit');
+                            updatedEditForm.style.display = 'none';
+                            updatedTaskDisplay.style.display = 'block';
+                        } else {
+                            console.error('Edit form or task display not found after update!');
+                        }
+                        if (editButton) {
+                            editButton.style.display = 'inline-flex';
+                            editButton.style.width = '30px';
+                            editButton.style.height = '30px';
+                            editButton.style.fontSize = '16px';
+                            editButton.style.lineHeight = '1';
+                        }
+
+                        const existingEventIndex = window.deadlineEvents.findIndex(event => event.id === taskId);
+                        if (data.deadline) {
+                            const deadlineDate = data.deadline;
+                            if (existingEventIndex !== -1) {
+                                window.deadlineEvents[existingEventIndex].start = deadlineDate;
+                                window.deadlineEvents[existingEventIndex].title = data.title;
+                                window.deadlineEvents[existingEventIndex].completed = data.completed;
+                            } else {
+                                window.deadlineEvents.push({
+                                    id: taskId,
+                                    title: data.title,
+                                    start: deadlineDate,
+                                    color: data.completed ? '#6c757d' : '#dc3545',
+                                    completed: data.completed
+                                });
+                            }
+                        } else if (existingEventIndex !== -1) {
+                            window.deadlineEvents.splice(existingEventIndex, 1);
+                        }
+
+                        updateCalendarEvents();
+                    } else {
+                        console.error(`Task element ${taskId} not found after edit`);
+                    }
                 } else {
                     console.error('Failed to edit task:', data);
                 }
