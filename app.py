@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy  # noqa: F401
 from views import main
 from models import db
 import os
@@ -30,5 +30,5 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    # app.run(debug=True, port=5002)
+    #app.run(debug=True, port=5002)
     pass
