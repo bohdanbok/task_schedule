@@ -184,6 +184,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const categories = await fetchAllCategories();
     updateCategoryDropdowns(categories);
 
+    // Инициализация Masonry
+    const grid = document.querySelector('.categories-grid');
+    if (grid) {
+        new Masonry(grid, {
+            itemSelector: '.category',
+            columnWidth: '.category', // Используем ширину первого элемента категории как ширину колонки
+            percentPosition: true,
+            gutter: 25, // Отступ между категориями, соответствует gap в CSS
+            fitWidth: true // Центрирует контейнер по доступной ширине
+        });
+    }
+
     // Загрузка данных о погоде
     fetchWeather();
 

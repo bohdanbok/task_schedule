@@ -250,9 +250,10 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 
 <script type="module" src="{{ url_for('static', filename='js/notificationHandler.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/utils.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/simpleCalendar.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/categoryHandler.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/taskHandler.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/simpleCalendar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/categoryHandler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/taskHandler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

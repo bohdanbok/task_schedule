@@ -184,8 +184,8 @@ body {
 
 /* Стили категорий */
 .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    /* display: grid; */
+    /* grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); */
     gap: 25px;
     align-items: flex-start;
 }
@@ -265,11 +265,10 @@ body {
 
 /* Стили для задач */
 .task-container {
-    margin-top: 15px;
-    max-height: 300px; /* Уменьшаем максимальную высоту, чтобы прокрутка появлялась раньше */
-    overflow-y: auto; /* Включаем вертикальную прокрутку */
-    overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
-    transition: max-height 0.3s ease-out; /* Добавлено для анимации */
+    /* max-height: 300px;  Убрал ограничение по высоте */
+    /* overflow-y: auto;  Убрал вертикальную прокрутку */
+    overflow-x: hidden; /* Скрывает горизонтальную прокрутку */
+    padding-right: 10px; /* Добавляет небольшой отступ справа, чтобы контент не прилипал к краю */
 }
 
 .task-container.collapsed {
