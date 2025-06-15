@@ -1,0 +1,130 @@
+Name,License Plate,State,Make,Model,Model Year,VIN,Fuel Type,Tank Capacity,Department,Location,Policy,Cards
+#000,ADMIN,FL,,,,,,,Royal Transportation,Miami,Royal Regular Policy,YRX051
+#1000,40AAXJ,,,,,1FDZX2CG0FKB08957,,N/A,Royal Transportation,Miami,Royal Regular Policy,YRX069
+#1001,QIYQ14,,,,,1FMZK1CM3KKA08196,,N/A,Royal Transportation,Miami,Royal Regular Policy,YRX001
+#1002,PKHQ50,,,,,1FBAX2C8XLKA03319,,N/A,Royal Transportation,Miami,Royal Regular Policy,
+#102,JIYP20,FL,FORD,TRANSIT,2015,4T1DAACK7SU028712,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#104,IMIC93,FL,Ford,,2014,1FTNS1EW1EDA08580,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#105,IMIC90,FL,Ford,E-150,2014,1FTNS1EW5EDA08579,Unleaded Regular,33.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#108,IMIC96,FL,FORD,TRANSIT,,1FBZX2XM6FKB05229,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#109,IZSD06,FL,Ford,,2014,1FTNS1EW8EDA04624,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#110,IZSD05,FL,FORD,E350,2014,1FBNE3BL8EDA32263,Unleaded Regular,33.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#111,JIXX85,FL,Ford,Pass VAN,2014,1FBSS3BL8EDA32100,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#112,JJTA19,FL,Ford,Transit,2017,1FTBW3XMXHKA02114,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX063
+#114,IZSD44,FL,Ford,Transit Wagon,2015,1FBZX2CM7FKB19534,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX120
+#116,KTWV03,FL,FORD,TRANSIT,2018,1FTYR2CM8JKA86697,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#117,KTWV04,FL,Ram,Promaster,,3C7WRVPG1JE137833,Unleaded Regular,24.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#119,KTWV02,FL,FORD,TRANSIT,2015,1FBZX2CM6FKB16558,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#120,IZSD87,FL,Ford,,2016,1FBZX2CM6GKA04974,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#121,LXGN45,FL,RAM,PRO,2019,3C6TRVPG4KE506242,Unleaded Super,24.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#122,56FCYK,FL,FORD,T350,,1FBZX2CM9JKB35646,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX129
+#123,NPKW85,FL,FORD,TRANS,2019,1FBAX2CM2KKA94484,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX125
+#124,NPKW84,FL,FORD,TRANSIT,,1FBAX2CG3KKA94391,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#125,NSCC21,FL,FORD,PASS,,1FBAX2CM3KKA94459,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#126,98DXLV,FL,Ford,,2019,1FBAX2CMXKKA94474,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,YRX092
+#127,PIPP76,FL,FORD,PASS,2014,1FTBR3X88LKA31663,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#128,NZWP24,FL,Ford,,2011,1FDEE3FL7BDA29898,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,YRX059
+#129,PGDD53,FL,FORD,T350,2015,1FBAX2XM9FKB08381,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX099
+#130,PGDD54,FL,FORD,,2016,1FBAX2CM6GKA98089,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#131,QWNB14,FL,Ford,Pass Bus,2012,1FDEE3FLXBDB04755,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#132,QWNB15,FL,Ford,E-450,2015,1FDFE4FS8FDA35104,Unleaded Plus,33.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#133,QWNR78,FL,FORD,TRANSIT,,1FTBR3X86LKA31662,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#134,QWNR77,FL,FORD,TRANSIT,2020,1FTBR3X88LKA31663,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#136,PGDD59,FL,CHEV,VAN,2019,1GAZGPFG7K1170216,Unleaded Regular,31.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#137,95AFYR,FL,FORD,VAN,2020,1FDAX2C89LKB26651,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX034
+#139,11AKTW,FL,RAM,Promaster Wind,2020,3C6TRVPG3LE122048,Unleaded Regular,24.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#140,PGDD91,FL,FORD,,2018,1FBAX2CM5JKA85874,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#141,PGDD93,FL,FORD,VAN,2023,1FDZX2CM9HKB21747,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX031
+#144,23AKTJ,FL,FORD,Pass,,1FBAX2Y8XLKA09520,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#145,22AKTJ,FL,FORD,,2015,1FBVU4XG3FKA95501,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#146,94AFYR,FL,Ford,Transit Wagon,2016,1FBZX2CM2GKA40306,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX098
+#147,50DNST,FL,FORD,TRANSIT,2015,1FBZX2ZM0FKA64626,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#148,96DXLL,FL,FORD,TRANSIT,2016,1FBZX2ZM3GKA39396,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX096
+#149,95DXLL,FL,Ford,Transit,2016,1FBZX2ZM2GKA11315,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#150,RNJA90,FL,FORD,TRANSIT,,1FBZX2ZMXGKB44596,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#151,JWAA47,FL,,,,,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Regular Policy,
+#152,JWAA46,FL,Ford,,2018,1FBZX2ZMXJKA29150,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#154,43BEBK,FL,Ford,,2021,1FBVU4X8XMKA05847,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#155,44BEBK,FL,Ford,Transit wagon,,1FBZX2CM8KKA07528,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX025
+#156,51BEBK,FL,Mercedes Benz,PASS VAN,2017,WDZPE7CD0HP563611,Diesel,24.5,Royal Transportation,Miami,Royal Bus/Van Policy,YRX080
+#158,95BEBK,FL,Ford,,2019,1FBZX2ZM2KKB64253,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,YRX119
+#159,96BEBK,FL,Ford,,2019,1FBVU4XM6KKB70272,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,YRX078
+#161,39DHCW,FL,Ford,,2017,1FBVU4XG5HKA04151,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,YRX075
+#164,45DHCW,FL,FORD,TRANSIT,2016,1FMZK1CMXGKA12625,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#165,BZ78SN,FL,Ford,,2017,1FBZX2YM1HKA50643,,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,YRX087
+#166,72DHCW,FL,FORD,TRANSIT,2015,1FBZX2ZM9FKA33553,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#167,BY76UD,FL,Ford,Transit,2020,1FDAX2C8XLKB09390,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#169,89DHCW,FL,DODGE,RAM,2020,3C6TRVPG5LE122049,Unleaded Regular,24.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#170,88DHCW,FL,Ford,Transit Wagon,2016,1FBAX2CGXGKA26354,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX024
+#171,95DXLV,FL,Ford,Transit,2020,1FBAX2C89LKB24407,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX070
+#172,07DHCW,FL,,,,,,,N/A,Royal Transportation,Miami,Royal Regular Policy,
+#173,D737561,FL,FORD,TRANSIT,2023,1FDVU4XG6PKB25969,,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX130
+#174,RXCD20,FL,FORD,TRANSIT,2023,1FDVU4XG8PKB23995,,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX060
+#175,RAGL61,FL,FORD,TRANSIT,2024,1FBAX2CG7RKB10828,,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX018
+#201,IZSD69,FL,Toyota,Rav4,2018,2T3WFREV1JW414290,Unleaded Regular,14.5,Royal Transportation,Miami,Royal Regular Policy,
+#202,IZSD68,FL,Toyoya,RAV 4,2018,2T3WFREV3JW410807,Unleaded Regular,14.5,Royal Transportation,Miami,Royal Regular Policy,YRX089
+#204,IZSD85,FL,DODGE,CARAVAN,,2C4RDGBG6GR140780,Unleaded Regular,20.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#205,07DVAF,FL,Hyundai,Sonata,2017,5NPE24AF8HH514266,Unleaded Regular,18.5,Royal Transportation,Miami,Royal Regular Policy,YRX064
+#206,99DXLV,FL,,,,,,,,N/A,Miami,Royal Regular Policy,YRX150
+#207,PIQU40,FL,Ford,T250,2020,1FTBR1C83LKA16675,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#208,PIQU41,FL,FORD,,2020,1FTBR1C89LKA16681,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Bus/Van Policy,
+#209,PIQU42,FL,FORD,T250,2020,1FTBR1C8XLKA16690,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#210,28EDFY,FL,Hyundai,Elantra,2022,5NPLM4AG1NH066880,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,YRX090
+#212,62AKTJ,FL,CHEV,MALIBU,,1G1ZD5STXMF087109,Unleaded Regular,15.8,Royal Transportation,Miami,Royal Regular Policy,"YRX073, YRX004"
+#213,63AKTJ,FL,Chevy,Malibu,2021,1G1ZD5ST2MF089081,Unleaded Regular,15.8,Royal Transportation,Miami,Royal Regular Policy,
+#214,61BCET,FL,HYUNDAI,Kona,2022,KM8K62AB8NU847959,Unleaded Regular,13.2,Royal Transportation,Miami,Royal Regular Policy,YRX100
+#215,54APHH,FL,Hyundai,Venue,2021,KMHRB8A30MU072125,Unleaded Regular,11.9,Royal Transportation,Miami,Royal Regular Policy,
+#217,41DAYS,FL,Hyundai,Elantra,2023,5NPLM4AG6PH093222,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,YRX041
+#218,96DHBT,FL,Hyundai,Elantra,2023,5NPLS4AG1PH093201,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,
+#219,04DHCW,FL,Ford,Transit Cargo,2018,NM0GE9F71J1353736,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#221,06DHCW,FL,BUICK,ENCORE,2019,KL4CJASB9KB792522,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,
+#222,AZ65LN,FL,Hyundai,Sonata,2019,5NPE24AF8KH819581,Unleaded Regular,18.5,Royal Transportation,Miami,Royal Regular Policy,YRX047
+#223,27DHCW,FL,KIA,FORTE,2020,5NPD74LF8LH585146,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,YRX139
+#224,59DHCW,FL,KIA,FORTE,2020,3KPF24AD8LE164590,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,
+#226,79DHCW,FL,Hyundai,Elantra,2020,5NPD84LF1LH592811,Unleaded Regular,14.0,Royal Transportation,Miami,Royal Regular Policy,YRX083
+#227,80DHCW,FL,HYUNDAI,ACCENT,2022,3KPC24A65NE159306,Unleaded Regular,11.9,Royal Transportation,Miami,Royal Regular Policy,YRX039
+#228,97DHCW,FL,Toyota,Corolla,2021,JTDEPMAE6MJ171130,Unleaded Regular,13.2,Royal Transportation,Miami,Royal Regular Policy,YRX049
+#229,08DVAF,FL,HYUNDAI,SONATA,,5NPE34AF4JH682912,Unleaded Regular,18.5,Royal Transportation,Miami,Royal Regular Policy,YRX044
+#230,96DXLV,FL,TOYOTA,CAMRY,,4T1G11AK5RU232810,Unleaded Regular,15.8,Royal Transportation,Miami,Royal Regular Policy,YRX023
+#231,97DXLV,FL,TOYOTA,CAMRY,2024,4T1G11AK2RU896580,Unleaded Regular,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX008
+#232,KY965R,FL,Toyota,Camry,2024,4T1DAACK3SU522095,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX046
+#233,KY964R,FL,Toyota,Camry,2025,4T1DAACK7SU028712,Unleaded Regular,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX014
+#234,RUII68,FL,Toyota,Camry,2025,4T1DAACK8SU027908,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX017
+#235,RUII67,FL,Toyota,Camry,2025,4T1DAACK9SU521095,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX032
+#236,RXCD21,,TOYOTA,SIENNA,2024,5TDKRKEC3RS212155,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,
+#237,RXCD22,,TOYOTA,SIENNA,2024,5TDKRKEC5RS212366,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX082
+#238,RUII72,FL,Toyota,Camry,2025,4T1DAACK8SU028766,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX071
+#239,RUII74,FL,TOYOTA,CAMRY,2025,4T1DAACK7SU027849,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX022
+#240,RUII73,FL,Toyota,Camry,2025,4T1DAACK9SU521291,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,
+#241,KP822Y,FL,TOYOTA,SIENNA,2024,5TDKRKECGRS207090,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,
+#242,RUII70,FL,Toyota,Sienna,2024,5TDKRKEC3RS206890,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX101
+#243,RUII71,FL,Toyota,Sienna,2024,5TDKRKECXRS206725,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX102
+#244,KP820Y,FL,Toyota,Sienna,2024,5TDKRKEC3RS212303,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX107
+#245,KP824Y,FL,Toyota,Camry,2025,4T1DAACK7SU043453,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX103
+#246,KP727Y,FL,Toyota,Camry,2025,4T1DAACK5SU042866,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX105
+#247,KP823Y,FL,Toyota,Camry,2025,4T1DAACK4SU038551,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX104
+#248,KP825Y,FL,TOYOTA,CAMRY,2024,4T1DAACK5SU536998,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX110
+#249,KP826Y,FL,TOYOTA,CAMRY,2025,4T1DAACK5SU536998,,15.8,Royal Transportation,Miami,Royal Hybrid Policy,YRX109
+#250,RXCD23,,TOYOTA,SIENNA,2024,5TDKRKEC3RS212351,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX144
+#251,RXCD24,,TOYOTA,SIENNA,2024,5TDKRKEC8RS212118,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX029
+#252,RXCD25,,TOYOTA,SIENNA,2024,5TDKRKEC7RS212370,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX137
+#253,RAGL57,FL,TOYOTA,SIENNA,2025,,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX011
+#254,RAGL58,FL,Toyota,Sienna,2025,5TDKRKECXSS225510,,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX077
+#255,RAGL59,FL,Toyota,Sienna,2025,,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX132
+#256,53ERQN,FL,FORD,TRANSIT,2024,1FBAX2C85RKB64878,,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX019
+#257,54ERQN,,FORD,TRANSIT,2024,1FBAX2C80RKB64836,,25.0,,,,Royal Bus/Van Policy,YRX133
+#258,74EXGS,FL,Toyota,Sienna,2025,5TDKRKEC9SS225935,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX030
+#259,76EXGS,FL,TOYOTA,SIENNA,2025,5TDKRKEC4SS226149,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX145
+#260,75EXGS,FL,TOYOTA,SIENNA,2025,5TDKRKEC3SS225963,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX148
+#261,DP19IF,FL,TOYOTA,SIENNA,2024,5TDKRKEC3RS218277,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX038
+#262,DJ51PU,FL,TOYOTA,SIENNA,2025,5TDKRKEC5SS226421,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,YRX048
+#263,DP18IF,FL,TOYOTA,SIENNA,2025,5TDKRKEC9SS225756,Unleaded Regular,18.0,Royal Transportation,Miami,Royal Hybrid Policy,
+#310,LBAM33,FL,FORD,TRANSIT,2018,1FTYR2CM0JKA86693,Unleaded Super,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX149
+#312,NMBD41,FL,RAM,,2019,3C6TRVPG6KE507392,Unleaded Regular,24.0,Royal Transportation,Miami,Royal Bus/Van Policy,YRX085
+#313,PIQU43,FL,Ford,T250,2020,1FTYE1C8XLKA16808,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#314,PIQU45,FL,FORD,T250,2020,1FTYE1C80LKA16803,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#315,PIQU44,FL,Ford,T250,2020,1FTYE1C89LKA16797,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#316,QFXS71,FL,RAM,Promaster,2020,3C6TRVPG3LE122051,Unleaded Regular,24.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+#317,QSQB07,,,,,3C6TRVPG0LE121052,Unleaded Regular,N/A,Royal Transportation,Miami,Royal Regular Policy,
+#400,02DVVP,FL,FORD,TRANSIT,2016,1FBZX2ZM8GKA39393,Unleaded Regular,25.0,Royal Transportation,Miami,Royal Bus/Van Policy,
+DEFECT,73DHCW,FL,TOYOTA,COROLLA,2020,4T1G11AK2RU896580,Unleaded Regular,13.2,Royal Transportation,Miami,Royal Regular Policy,YRX028

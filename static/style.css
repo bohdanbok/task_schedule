@@ -1,143 +1,221 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: #f5f7fa;
-    color: #333;
+/* Общие стили */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --accent-color: #28a745;
+    --danger-color: #dc3545;
+    --light-bg: #f8f9fa;
+    --dark-bg: #e9ecef;
+    --border-color: #dee2e6;
+    --text-color: #343a40;
+    --light-text-color: #6c757d;
+    --card-bg: #ffffff;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --border-radius: 0.3rem;
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    position: relative;
-}
-
-/* Календарь в правом верхнем углу */
-.calendar-wrapper {
+/* Навигационная панель */
+.navbar {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 300px;
+    top: 0;
+    right: 0;
+    width: 100%; /* Занимает всю ширину */
+    background-color: transparent; /* Прозрачный фон */
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end; /* Выравнивание по правому краю */
+    align-items: center;
     z-index: 1000;
 }
 
-.calendar-toggle {
+.navbar .container {
     display: flex;
     justify-content: flex-end;
-    cursor: pointer;
-    font-size: 1.2em;
-    padding: 5px;
-    background: #fff;
-    border-radius: 8px 8px 0 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#calendar {
-    background: #ffffff;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    transition: height 0.3s ease, opacity 0.3s ease;
-    overflow: hidden;
-}
-
-#calendar.collapsed {
-    height: 0;
+    width: auto; /* Позволяет контейнеру не растягиваться на всю ширину */
     padding: 0;
-    opacity: 0;
-    border-radius: 0;
 }
 
-#calendar.calendar-expanded {
-    height: auto;
-    opacity: 1;
+html, body {
+    height: 100%;
 }
 
-#calendar .fc {
-    font-size: 0.85em;
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    padding-bottom: 120px; /* Увеличиваем отступ, чтобы учесть две строки кнопок */
 }
 
-#calendar .fc-toolbar-title {
+.container {
+    max-width: 1400px; /* Увеличиваем максимальную ширину контейнера */
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.top-widgets-container {
+    display: flex;
+    justify-content: center; /* Центрируем содержимое */
+    align-items: center;
+    gap: 20px; /* Расстояние между элементами */
+    margin: 0 auto 30px auto; /* Центрирование блока и отступ снизу */
+    width: fit-content; /* Ширина по содержимому */
+    flex-wrap: wrap; /* Позволяет элементам переноситься на новую строку на маленьких экранах */
+}
+
+.top-widgets-container h1 {
+    margin: 0; /* Убираем стандартные отступы h1, так как они будут управляться flex-контейнером */
+    text-align: left; /* Убираем центрирование текста h1 */
+    white-space: nowrap; /* Предотвращает перенос текста на новую строку */
+}
+
+#weather-widget {
+    margin-bottom: 0; /* Убираем нижний отступ, так как он будет управляться gap в flex-контейнере */
     font-size: 1em;
-    color: #2c3e50;
+    color: var(--text-color);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    margin: 0; /* Убираем margin auto, так как он будет управляться top-widgets-container */
 }
 
-#calendar .fc-button {
-    padding: 2px 6px;
-    font-size: 0.75em;
-    background: #3498db;
-    border: none;
-    color: #fff;
+#weather-widget .current-weather {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
-#calendar .fc-button:hover {
-    background: #2980b9;
+#weather-widget .current-weather p {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 500;
 }
 
-#calendar .fc-daygrid-day {
+#weather-widget .current-weather img {
+    width: 40px;
     height: 40px;
 }
 
-#calendar .fc-daygrid-day-number {
-    font-size: 0.7em;
+#weather-widget .forecast-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-#calendar .fc-event {
-    font-size: 0.65em;
-    padding: 1px 2px;
-    border-radius: 3px;
+#weather-widget .forecast-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--dark-bg);
+    padding: 8px;
+    border-radius: var(--border-radius);
+    font-size: 0.8em;
 }
 
-/* Основной контент */
-h1, h2 {
-    color: #2c3e50;
-    margin-bottom: 20px;
+#weather-widget .forecast-item p {
+    margin: 0;
 }
 
-h1 {
-    font-size: 2em;
+#weather-widget .forecast-item img {
+    width: 30px;
+    height: 30px;
+}
+
+#traffic-widget {
+    width: 350px; /* Увеличена ширина для карты */
+    height: 250px; /* Увеличена высота для карты */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden; /* Обрезаем, если что-то выходит за рамки */
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    display: flex; /* Добавляем flexbox для удобного расположения содержимого */
+    flex-direction: column; /* Элементы располагаются в столбец */
+}
+
+#traffic-summary {
+    padding: 8px 10px;
+    font-size: 0.9em;
+    color: var(--text-color);
+    background-color: var(--dark-bg);
+    border-bottom: 1px solid var(--border-color);
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    flex-shrink: 0; /* Чтобы не сжимался */
 }
 
-h2 {
-    font-size: 1.5em;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 5px;
+#traffic-widget > div:last-child {
+    flex-grow: 1; /* Карта занимает оставшееся пространство */
+}
+
+#travel-time-widget {
+    width: 200px; /* Уменьшаем ширину */
+    height: 150px; /* Уменьшаем высоту */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 10px; /* Уменьшаем внутренний отступ */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#travel-time-widget h3 {
+    margin-top: 0;
+    margin-bottom: 10px; /* Уменьшаем отступ */
+    color: var(--primary-color);
+    font-size: 1.1em; /* Уменьшаем размер шрифта */
+}
+
+#travel-time-widget p {
+    margin-bottom: 5px; /* Уменьшаем отступ */
+    font-size: 0.9em; /* Уменьшаем размер шрифта */
+    color: var(--text-color);
+}
+
+/* Стили категорий */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 25px;
+    align-items: flex-start;
 }
 
 .category {
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    box-shadow: var(--shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: move;
 }
 
 .category:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-.category.dragging {
-    opacity: 0.5;
-    transform: scale(0.98);
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .category-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.3em;
-    color: #2c3e50;
     margin-bottom: 15px;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2em;
     position: relative;
+    overflow: hidden;
 }
 
 .category-header::before {
@@ -147,194 +225,179 @@ h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: inherit;
-    opacity: 0.9;
-    border-radius: 6px;
+    background: inherit; /* Использует цвет фона родителя */
+    opacity: 0.8; /* Небольшая прозрачность */
     z-index: -1;
 }
 
-.category-header, .category-header * {
-    color: #ffffff;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+.category-header h3 {
+    margin: 0;
+    color: #fff; /* Цвет текста для лучшей читаемости */
 }
 
-.task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0;
-    padding: 15px;
-    background: #f9fbfc;
-    border: 1px solid #e1e4e8;
-    border-radius: 8px;
-    transition: background 0.3s ease;
-}
-
-.task-item:hover {
-    background: #eef4f9;
-}
-
-.task-content {
-    flex: 1;
-}
-
-.task-content p {
-    margin: 5px 0;
-    color: #5f6a7d;
-    font-size: 0.95em;
-}
-
-.task-content .completed {
-    text-decoration: line-through;
-    color: #95a5a6;
-}
-
-.task-image {
-    max-width: 100px;
-    max-height: 100px;
-    cursor: pointer;
-    margin-top: 5px;
-    border-radius: 4px;
-}
-
-.task-actions {
+.button-group {
     display: flex;
     gap: 8px;
 }
 
 .btn-action {
-    display: inline-flex; /* Используем flex для центрирования иконки */
-    align-items: center;
-    justify-content: center;
-    width: 30px; /* Фиксированная ширина */
-    height: 30px; /* Фиксированная высота */
-    font-size: 16px; /* Размер иконки */
-    line-height: 1; /* Убираем лишние отступы от line-height */
-    padding: 0; /* Убираем внутренние отступы */
-    border-radius: 50%; /* Круглая форма */
-    text-align: center;
-    vertical-align: middle;
-    box-sizing: border-box; /* Учитываем border и padding в размерах */
-    border: 1px solid #ccc; /* Для наглядности границы */
-    background-color: #f0f0f0; /* Фон кнопки */
+    background: none;
+    border: none;
     cursor: pointer;
-}
-
-.edit-task-button {
-    transform: none !important; /* Убедимся, что нет трансформаций */
-    -webkit-transform: none !important;
-    -moz-transform: none !important;
-    -ms-transform: none !important;
-    -o-transform: none !important;
+    font-size: 1.3em;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background-color 0.3s, color 0.3s;
+    color: var(--text-color); /* Иконки темного цвета для лучшей видимости */
 }
 
 .btn-action:hover {
-    background: #dee2e6;
-    color: #212529;
-    transform: scale(1.1);
+    background-color: rgba(0, 0, 0, 0.1); /* Легкий фон при наведении */
 }
 
 .btn-action-danger {
-    background: #f8d7da;
-    color: #721c24;
+    color: var(--danger-color); /* Иконка удаления красного цвета */
 }
 
 .btn-action-danger:hover {
-    background: #f5c6cb;
-    color: #721c24;
+    background-color: rgba(255, 0, 0, 0.3); /* Красный фон при наведении */
 }
 
-.create-buttons {
-    position: fixed;
-    top: 20px;
-    left: 20px;
+/* Стили для задач */
+.task-container {
+    margin-top: 15px;
+    max-height: 500px; /* Добавлено для анимации */
+    overflow: hidden; /* Добавлено для анимации */
+    transition: max-height 0.3s ease-out; /* Добавлено для анимации */
+}
+
+.task-container.collapsed {
+    max-height: 0; /* Скрываем содержимое при сворачивании */
+}
+
+.task-item {
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    box-shadow: var(--shadow);
+    transition: background-color 0.2s ease;
+}
+
+.task-item:hover {
+    background-color: var(--dark-bg);
+}
+
+.task-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--primary-color);
+}
+
+.task-container.drag-over {
+    border: 2px dashed var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.task-item.drag-over-top {
+    border-top: 2px solid var(--accent-color);
+}
+
+.task-item.drag-over-bottom {
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.task-content {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
+    gap: 5px;
 }
 
-.create-buttons .btn {
-    padding: 10px 20px;
-    width: 180px;
-    text-align: center;
-    border-radius: 6px;
-    white-space: nowrap;
+.task-content strong {
+    font-size: 1.1em;
+    color: var(--text-color);
 }
 
+.task-content p {
+    margin: 0;
+    color: var(--light-text-color);
+    font-size: 0.9em;
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: var(--light-text-color) !important;
+}
+
+/* Стили для форм */
 .popup {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
+    background-color: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 1000;
 }
 
 .popup-content {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+}
+
+.popup-content h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    font-size: 1.8em;
 }
 
 .popup-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.popup h3 {
-    margin-top: 0;
-    color: #2c3e50;
-    font-size: 1.5em;
-}
-
-.btn-cancel {
-    background: #6c757d;
-    color: #fff;
-}
-
-.btn-cancel:hover {
-    background: #5a6268;
+    gap: 20px;
 }
 
 .input-group {
-    position: relative;
     display: flex;
-    align-items: center;
-}
-
-.input-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6b7280;
-    font-size: 1.2em;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .input {
-    padding: 10px 10px 10px 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    width: 100%;
-    font-size: 0.95em;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    color: var(--text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 textarea.input {
@@ -344,148 +407,552 @@ textarea.input {
 
 select.input {
     appearance: none;
-    background: url('data:image/svg+xml;utf8,<svg fill="%236b7280" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 10px center;
+    background: url('data:image/svg+xml;utf8,<svg fill="%236c757d" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 12px center;
     background-size: 16px;
+    padding-right: 30px;
 }
 
 .file-input {
-    padding: 10px 10px 10px 40px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .color-picker {
-    padding: 10px 10px 10px 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    width: 100%;
     height: 40px;
-    background: #fff;
-    cursor: pointer;
-}
-
-.edit-form .input-group {
-    margin-bottom: 10px;
-}
-
-.button-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    padding: 5px;
 }
 
 .btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
+    padding: 8px 15px; /* Сохраняем общие отступы для кнопок с текстом */
+    font-size: 1em;
+    font-weight: 600;
     cursor: pointer;
-    text-decoration: none;
-    font-size: 0.9em;
-    transition: background 0.3s ease, transform 0.1s ease;
+    border: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .btn:hover {
     transform: translateY(-1px);
 }
 
+.btn:active {
+    transform: translateY(0);
+}
+
 .btn-primary {
-    background: #3498db;
+    background-color: var(--primary-color);
     color: #fff;
 }
 
 .btn-primary:hover {
-    background: #2980b9;
+    background-color: #0069d9;
 }
 
-.btn-danger {
-    background: #e74c3c;
+.btn-cancel {
+    background-color: var(--secondary-color);
     color: #fff;
 }
 
-.btn-danger:hover {
-    background: #c0392b;
+.btn-cancel:hover {
+    background-color: #5a6268;
 }
 
-.btn-save {
-    background: #2ecc71;
-    color: #fff;
-}
-
-.btn-save:hover {
-    background: #27ae60;
-}
-
-.btn:active {
-    transform: translateY(1px);
-}
-
-.d-none {
-    display: none;
-}
-
-/* Модальное окно для изображения */
-.modal {
+.document-modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 3000;
+    background-color: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
-.modal-close {
+.document-modal-content {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+}
+
+.document-modal-close {
     position: absolute;
     top: 10px;
-    right: 20px;
-    color: #fff;
-    font-size: 30px;
+    right: 15px;
+    color: var(--text-color);
+    font-size: 2em;
     cursor: pointer;
 }
 
-#modal-image {
-    max-width: 90%;
-    max-height: 90%;
+.document-modal-close:hover {
+    color: var(--primary-color);
+}
+
+.document-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease;
+}
+
+.document-link:hover {
+    background-color: #0056b3;
+}
+
+.file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    overflow-wrap: break-word;
+}
+
+.file-item {
+    position: relative;
+    background-color: var(--dark-bg);
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: normal;
+}
+
+.file-item .delete-file {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.file-item:hover .delete-file {
+    opacity: 1;
+}
+
+.file-item .delete-file:hover {
+    background-color: #c82333;
+}
+
+.task-image {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.file-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9em;
+    word-break: break-all;
+}
+
+.file-link:hover {
+    text-decoration: underline;
+}
+
+/* Стили для контейнера кнопок действий */
+.action-buttons-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Отступ между группами кнопок */
+    z-index: 999;
+    align-items: flex-end; /* Выравнивание групп кнопок по правому краю */
+}
+
+/* Стили для кнопок создания */
+.create-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Стили для кнопок действий пользователя (настройки, выход) */
+.user-action-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.create-buttons .btn {
+    min-width: 250px; /* Устанавливаем достаточную минимальную ширину для текста */
+    width: 250px; /* Устанавливаем фиксированную ширину */
+    height: 40px; /* Фиксированная высота */
+    display: inline-flex; /* Используем inline-flex для центрирования */
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center; /* Центрирование по вертикали */
+    white-space: nowrap !important; /* Запрещаем перенос текста (важно) */
+    overflow: hidden; /* Скрываем выходящий за границы текст */
+    text-overflow: ellipsis; /* Добавляем многоточие для скрытого текста */
+    padding: 8px 15px; /* Явно задаем отступы для текстовых кнопок */
+    flex-shrink: 0; /* Предотвращаем сжатие кнопки */
+    box-sizing: border-box; /* Включаем padding в общую ширину */
+}
+
+.user-action-buttons .btn {
+    /* Этот селектор больше не нужен, так как стили применяются напрямую к .logout-btn и .settings-btn */
+}
+
+/* Скрытые элементы */
+.d-none {
+    display: none !important;
 }
 
 /* Адаптивность */
-@media (max-width: 600px) {
-    .calendar-wrapper {
-        top: 10px;
-        right: 10px;
-        width: 250px;
-        border-radius: 12px;
-        overflow: hidden;
+@media (max-width: 768px) {
+    .container {
+        margin: 10px auto;
+        padding: 0 15px;
     }
 
-    .calendar-toggle {
-        border-radius: 12px 12px 0 0;
+    h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
     }
 
-    #calendar {
-        border-radius: 0 0 12px 12px;
+    .category {
+        padding: 10px;
     }
 
-    #calendar.collapsed {
-        border-radius: 0;
+    .category-header {
+        font-size: 1.1em;
+        padding: 8px 10px;
+    }
+
+    .btn-action {
+        font-size: 1.2em;
+        padding: 4px;
+    }
+
+    .task-item {
+        padding: 10px;
+    }
+
+    .task-content strong {
+        font-size: 1em;
+    }
+
+    .task-content p {
+        font-size: 0.85em;
+    }
+
+    .popup-content {
+        padding: 20px;
+    }
+
+    .popup-content h3 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        font-size: 0.95em;
     }
 
     .create-buttons {
-        top: 10px;
-        left: 10px;
+        bottom: 10px;
+        right: 10px;
+        gap: 8px;
     }
 
     .create-buttons .btn {
-        width: 160px;
-        font-size: 0.85em;
+        min-width: 150px;
+    }
+
+    .document-modal-content {
+        padding: 20px;
+    }
+
+    .document-modal-close {
+        font-size: 1.8em;
+    }
+
+    /* Новые медиа-запросы для календаря */
+    .calendar-wrapper {
+        width: 100%;
+        left: 0;
+        right: 0;
+        top: auto;
+        bottom: 0;
+        border-radius: 25px 25px 0 0;
+        box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .calendar-toggle {
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
     }
 }
 
-.normal-orientation {
-    transform: none !important;
-    -webkit-transform: none !important; /* Для совместимости с Webkit-браузерами */
-    -moz-transform: none !important;    /* Для Firefox */
-    -ms-transform: none !important;     /* Для IE */
-    -o-transform: none !important;      /* Для Opera */
+@media (max-width: 480px) {
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .create-buttons {
+        flex-direction: row;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: auto;
+        justify-content: center;
+    }
+
+    .create-buttons .btn {
+        flex-grow: 1;
+    }
+    body {
+        padding-bottom: 60px;
+    }
+}
+
+/* Стили для уведомлений (Notification) */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    width: 100%;
+}
+
+.notification {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    word-wrap: break-word;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.notification-success {
+    border-left: 5px solid var(--accent-color);
+}
+
+.notification-error {
+    border-left: 5px solid var(--danger-color);
+}
+
+.notification-info {
+    border-left: 5px solid var(--primary-color);
+}
+
+/* Адаптивность для уведомлений */
+@media (max-width: 480px) {
+    #notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .notification {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+}
+
+/* Календарь */
+.calendar-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px; /* Фиксированная ширина для компактности */
+    z-index: 999; /* Чтобы календарь был поверх другого контента */
+    border: 1px solid var(--border-color);
+    border-radius: 25px; /* Скругленные углы */
+    box-shadow: var(--shadow);
+    overflow: hidden; /* Скрываем содержимое при сворачивании */
+    transition: max-height 0.3s ease-in-out; /* Анимируем max-height */
+}
+
+.calendar-toggle {
+    padding: 12px;
+    background-color: var(--dark-bg);
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.1em;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+
+.calendar-content {
+    max-height: 9999px; /* Большая высота для развернутого состояния */
+    overflow: auto; /* Позволяем прокрутку, если контента много */
+    background-color: var(--card-bg);
+    padding: 15px;
+}
+
+.calendar-wrapper.calendar-collapsed .calendar-content {
+    max-height: 0; /* Сворачиваем календарь */
+    overflow: hidden;
+    padding: 0;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 5px;
+    border-radius: var(--border-radius);
+}
+
+.calendar-header button:hover {
+    background-color: var(--dark-bg);
+}
+
+.calendar-grid-header,
+.calendar-grid-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    gap: 5px;
+}
+
+.calendar-grid-header span {
+    font-weight: bold;
+    color: var(--light-text-color);
+}
+
+.calendar-day {
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: var(--text-color); /* Устанавливаем цвет текста, чтобы цифры были видны */
+}
+
+.calendar-day:hover {
+    background-color: var(--dark-bg);
+}
+
+.calendar-day.empty {
+    visibility: hidden;
+}
+
+.calendar-day.current-day {
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+}
+
+.calendar-day.has-task {
+    background-color: #ffc107; /* Желтый цвет для дней с задачами */
+    color: #333;
+    font-weight: bold;
+}
+
+.calendar-day.has-task.current-day {
+    background-color: #dc3545; /* Красный цвет, если сегодня и есть задачи */
+}
+
+/* Стили для квадратных кнопок-иконок */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--border-radius); /* Используем общий радиус для скругления */
+    font-size: 1.7em; /* Увеличиваем размер иконки */
+    transition: background-color 0.2s ease;
+    color: #fff; /* Цвет иконки */
+    text-decoration: none; /* Убираем подчеркивание для ссылок-кнопок */
+    flex-shrink: 0; /* Предотвращаем сжатие кнопки */
+    padding: 0 !important; /* Убираем отступы для квадратных кнопок (важно) */
+}
+
+.logout-btn {
+    background-color: var(--danger-color); /* Красная кнопка */
+}
+
+.logout-btn:hover {
+    background-color: #bd2130;
+}
+
+.settings-btn {
+    background-color: var(--secondary-color); /* Серый фон для кнопки настроек */
+}
+
+.settings-btn:hover {
+    background-color: #5a6268; /* Темнее серый при наведении */
+}
+
+/* Дополнительные корректировки для top-widgets-container, чтобы все уместилось */
+@media (min-width: 992px) { /* Только для экранов шире 992px */
+    .top-widgets-container {
+        justify-content: space-between; /* Распределяем пространство */
+        gap: 15px; /* Уменьшаем зазор между виджетами */
+    }
 }

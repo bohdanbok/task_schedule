@@ -1,0 +1,36 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Schedule{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/mapInitializer.js') }}"></script>
+</head>
+
+<body>
+    
+    <div class="container">
+        <div class="top-widgets-container">
+            <div id="weather-widget">
+                <p>Виджет погоды здесь (пока не настроен)</p>
+            </div>
+            <div id="traffic-widget">
+                <div id="traffic-summary">Загруженность дорог в районе 650 NE 2nd Ave, Майами: смотрите на карте</div>
+                <!-- Карта пробок будет здесь -->
+            </div>
+            <div id="travel-time-widget">
+                <h3>Время в пути</h3>
+                <p id="home-to-work">🏠 → 🏢: Загрузка...</p>
+                <p id="work-to-home">🏢 → 🏠: Загрузка...</p>
+            </div>
+        </div>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZIk3uFh47iHkQMI1CpSFgKQ88GT0KUXQ&callback=initMap"></script> 

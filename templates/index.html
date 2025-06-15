@@ -1,145 +1,49 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список задач</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
-    <style>
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .task-content {
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-        .task-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-            min-width: 80px;
-        }
-        .task-actions .btn-action {
-            margin: 0;
-            padding: 5px 10px;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            line-height: 1;
-        }
-        .edit-task-button {
-            transform: none !important;
-        }
-        .file-list a, .file-list img.task-image {
-            display: block;
-            margin: 2px 0;
-        }
-        .file-list img.task-image {
-            max-width: 100px;
-        }
-        .file-link {
-            cursor: pointer;
-            color: #007bff;
-            text-decoration: underline;
-        }
-        .file-link:hover {
-            color: #0056b3;
-        }
-        .document-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .document-modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-        }
-        .document-modal-content p {
-            margin: 0 0 15px;
-            font-size: 16px;
-        }
-        .document-modal-content a {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .document-modal-content a:hover {
-            background: #0056b3;
-        }
-        .document-modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .existing-files {
-            margin: 10px 0;
-        }
-        .existing-files label {
-            display: block;
-            margin: 5px 0;
-        }
-        .existing-files input[type="checkbox"] {
-            margin-right: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Список задач</h1>
+{% extends "base.html" %}
 
-        <div class="calendar-wrapper">
-            <div class="calendar-toggle" title="Свернуть/развернуть календарь">🔽</div>
-            <div id="calendar" class="calendar-expanded"></div>
+{% block content %}
+<div class="container">
+    <h1>Задачи</h1>
+
+    <!-- Новый блок календаря -->
+    <div class="calendar-wrapper calendar-collapsed">
+        <div class="calendar-toggle">
+            <span>Календарь</span>
+            <span class="toggle-icon"></span>
         </div>
+        <div class="calendar-content">
+            <div class="calendar-header">
+                <button id="prevMonth">&lt;</button>
+                <span id="currentMonthYear"></span>
+                <button id="nextMonth">&gt;</button>
+            </div>
+            <div class="calendar-grid-header">
+                <span>Вс</span>
+                <span>Пн</span>
+                <span>Вт</span>
+                <span>Ср</span>
+                <span>Чт</span>
+                <span>Пт</span>
+                <span>Сб</span>
+            </div>
+            <div id="calendar-days" class="calendar-grid-days"></div>
+        </div>
+    </div>
 
+    <div class="categories-grid">
         {% for cat in categories %}
             <div class="category" id="category-{{ cat.id }}" draggable="true">
-                <h3 class="category-header" style="background-color: {{ cat.color }};">
-                    {{ cat.name }}
+                <div class="category-header" style="background-color: {{ cat.color }};">
+                    <h3>{{ cat.name }}</h3>
                     <div class="button-group">
-                        <button class="edit-category-color btn" data-cat-id="{{ cat.id }}" title="Изменить цвет">🎨</button>
-                        <button class="toggle-tasks btn" data-cat-id="{{ cat.id }}">🔽</button>
-                        <a href="#" class="delete-category btn btn-danger" data-cat-id="{{ cat.id }}">✕</a>
+                        <button class="edit-category-color btn-action" data-cat-id="{{ cat.id }}" title="Изменить цвет категории">🎨</button>
+                        <button class="toggle-tasks btn-action" data-cat-id="{{ cat.id }}" title="Свернуть/развернуть задачи">🔽</button>
+                        <button class="delete-category btn-action btn-action-danger" data-cat-id="{{ cat.id }}" title="Удалить категорию">✕</button>
                     </div>
-                </h3>
+                </div>
                 <div id="task-container-{{ cat.id }}" class="task-container">
                     {% for task_data in tasks_by_cat[cat.id] %}
                         {% set task = task_data.task %}
-                        <div class="task-item" id="task-{{ task.id }}" data-task-id="{{ task.id }}">
+                        <div class="task-item" id="task-{{ task.id }}" data-task-id="{{ task.id }}" data-task-deadline="{% if task.deadline %}{{ task.deadline.strftime('%Y-%m-%d') }}{% endif %}" draggable="true">
                             <div class="task-content">
                                 <div id="task-display-{{ task.id }}">
                                     <strong class="{{ 'completed' if task.completed else '' }}">{{ task.title }}</strong>
@@ -162,144 +66,193 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                <form id="edit-task-form-{{ task.id }}" class="edit-form" style="display: none;">
-                                    <div class="input-group">
-                                        <span class="input-icon">📝</span>
-                                        <textarea name="new_note" class="input" placeholder="Введите заметку">{{ task.note or '' }}</textarea>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-icon">🗓️</span>
-                                        <input type="text" name="new_deadline" value="{% if task.deadline %}{{ task.deadline.strftime('%d.%m.%Y') }}{% endif %}" placeholder="ДД.ММ.ГГГГ" class="input deadline-input">
-                                    </div>
-                                    {% if task_data.files %}
-                                        <div class="existing-files">
-                                            <p>Существующие файлы (отметьте для удаления):</p>
-                                            {% for file in task_data.files %}
-                                                <label>
-                                                    <input type="checkbox" name="delete_files" value="{{ file.url }}">
-                                                    {{ file.filename }}
-                                                </label>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <div class="input-group">
-                                        <span class="input-icon">📎</span>
-                                        <input type="file" name="file" class="input file-input" accept=".pdf,.docx,.png,.jpg,.jpeg,.gif,.csv,.xlsx" multiple>
-                                    </div>
-                                    <div class="button-group">
-                                        <button type="submit" class="btn btn-save" data-task-id="{{ task.id }}">Сохранить</button>
-                                        <button type="button" class="cancel-edit btn" data-task-id="{{ task.id }}">Отмена</button>
-                                    </div>
-                                </form>
+                                <!-- Удалена встроенная форма редактирования задачи -->
                             </div>
                             <div class="task-actions">
                                 <button class="edit-task-button btn-action" data-task-id="{{ task.id }}" title="Редактировать задачу">✏️</button>
-                                <a href="#" class="toggle-task btn-action" data-task-id="{{ task.id }}" title="{{ 'Возобновить' if task.completed else 'Завершить' }}">{% if task.completed %}↺{% else %}✓{% endif %}</a>
-                                <a href="#" class="delete-task btn-action btn-action-danger" data-task-id="{{ task.id }}" title="Удалить">✕</a>
+                                <button class="toggle-task btn-action" data-task-id="{{ task.id }}" title="{{ 'Возобновить' if task.completed else 'Завершить' }}">{% if task.completed %}↺{% else %}✓{% endif %}</button>
+                                <button class="delete-task btn-action btn-action-danger" data-task-id="{{ task.id }}" title="Удалить">✕</button>
                             </div>
                         </div>
                     {% endfor %}
                     {% if not tasks_by_cat[cat.id] %}
-                        <p>Задачи отсутствуют</p>
+                        <p class="no-tasks-message">Задачи отсутствуют</p>
                     {% endif %}
                 </div>
             </div>
         {% endfor %}
     </div>
+</div>
 
+<div class="action-buttons-wrapper">
     <div class="create-buttons">
         <button id="create-category-btn" class="btn btn-primary">Создать категорию</button>
         <button id="create-task-btn" class="btn btn-primary">Создать задачу</button>
     </div>
 
-    <div id="category-popup" class="popup" style="display: none;">
-        <div class="popup-content">
-            <h3>Добавить категорию</h3>
-            <form id="add-category-form" class="popup-form">
-                <div class="input-group">
-                    <span class="input-icon">📁</span>
-                    <input type="text" name="category_name" placeholder="Название категории" class="input">
-                </div>
-                <div class="input-group">
-                    <span class="input-icon">🎨</span>
-                    <input type="color" name="category_color" value="#ffffff" class="input color-picker">
-                </div>
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">Добавить</button>
-                    <button type="button" class="btn btn-cancel" id="cancel-category-btn">Отмена</button>
-                </div>
-            </form>
-        </div>
+    {% if current_user.is_authenticated %}
+    <div class="user-action-buttons">
+        <button id="settings-btn" class="btn btn-secondary settings-btn icon-btn" title="Настройки">⚙️</button>
+        <a href="{{ url_for('main.logout') }}" class="btn btn-secondary logout-btn icon-btn" title="Выход">&#x23FB;</a>
     </div>
+    {% endif %}
+</div>
 
-    <div id="edit-color-popup" class="popup" style="display: none;">
-        <div class="popup-content">
-            <h3>Изменить цвет категории</h3>
-            <form id="edit-color-form" class="popup-form">
-                <div class="input-group">
-                    <span class="input-icon">🎨</span>
-                    <input type="color" name="category_color" value="#ffffff" class="input color-picker">
-                </div>
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">Сохранить</button>
-                    <button type="button" class="btn btn-cancel" id="cancel-edit-color-btn">Отмена</button>
-                </div>
-            </form>
-        </div>
+<div id="category-popup" class="popup">
+    <div class="popup-content">
+        <h3>Добавить категорию</h3>
+        <form id="add-category-form" class="popup-form">
+            <div class="input-group">
+                <label for="category_name">Название категории:</label>
+                <input type="text" id="category_name" name="category_name" placeholder="Название категории" class="input" required>
+            </div>
+            <div class="input-group">
+                <label for="category_color">Цвет категории:</label>
+                <input type="color" id="category_color" name="category_color" value="#ffffff" class="input color-picker">
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Добавить</button>
+                <button type="button" class="btn btn-cancel" id="cancel-category-btn">Отмена</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div id="task-popup" class="popup" style="display: none;">
-        <div class="popup-content">
-            <h3>Добавить задачу</h3>
-            <form id="add-task-form" class="popup-form">
-                <div class="input-group">
-                    <span class="input-icon">📋</span>
-                    <input type="text" name="title" placeholder="Название задачи" class="input">
-                </div>
-                <div class="input-group">
-                    <span class="input-icon">📝</span>
-                    <textarea name="note" placeholder="Заметка" class="input"></textarea>
-                </div>
-                <div class="input-group">
-                    <span class="input-icon">🗓️</span>
-                    <input type="text" name="deadline" placeholder="Дедлайн (ДД.ММ.ГГГГ)" class="input deadline-input">
-                </div>
-                <div class="input-group">
-                    <span class="input-icon">📂</span>
-                    <select name="category_id" class="input">
-                        <option value="">Выберите категорию</option>
-                        {% for cat in categories %}
-                            <option value="{{ cat.id }}">{{ cat.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="input-group">
-                    <span class="input-icon">📎</span>
-                    <input type="file" name="file" class="input file-input" accept=".pdf,.docx,.png,.jpg,.jpeg,.gif,.csv,.xlsx" multiple>
-                </div>
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">Добавить</button>
-                    <button type="button" class="btn btn-cancel" id="cancel-task-btn">Отмена</button>
-                </div>
-            </form>
-        </div>
+<div id="edit-color-popup" class="popup">
+    <div class="popup-content">
+        <h3>Изменить цвет категории</h3>
+        <form id="edit-color-form" class="popup-form">
+            <div class="input-group">
+                <label for="edit_category_color">Выберите новый цвет:</label>
+                <input type="color" id="edit_category_color" name="category_color" value="#ffffff" class="input color-picker">
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <button type="button" class="btn btn-cancel" id="cancel-edit-color-btn">Отмена</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div id="image-modal" class="modal" style="display: none;">
-        <span class="modal-close">×</span>
-        <img id="modal-image" src="" alt="Полноразмерное изображение">
+<div id="task-popup" class="popup">
+    <div class="popup-content">
+        <h3>Добавить задачу</h3>
+        <form id="add-task-form" class="popup-form">
+            <div class="input-group">
+                <label for="task_title">Название задачи:</label>
+                <input type="text" id="task_title" name="task_title" placeholder="Название задачи" class="input" required>
+            </div>
+            <div class="input-group">
+                <label for="task_note">Заметка:</label>
+                <textarea id="task_note" name="task_note" placeholder="Заметка" class="input"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="task_deadline">Срок выполнения (ДД.ММ.ГГГГ):</label>
+                <input type="text" id="task_deadline" name="task_deadline" placeholder="ДД.ММ.ГГГГ" class="input deadline-input">
+            </div>
+            <div class="input-group">
+                <label for="category_id">Категория:</label>
+                <select id="category_id" name="category_id" class="input category-select" required>
+                    <option value="">Выберите категорию</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="task_file">Добавить файл:</label>
+                <input type="file" id="task_file" name="file" class="input file-input" accept=".pdf,.docx,.png,.jpg,.jpeg,.gif,.csv,.xlsx" multiple>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Добавить</button>
+                <button type="button" class="btn btn-cancel" id="cancel-task-btn">Отмена</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div id="document-modal" class="document-modal" style="display: none;">
-        <div class="document-modal-content">
-            <span class="document-modal-close">×</span>
-            <p>Документ: <span id="document-name"></span></p>
-            <a id="document-download" href="#" target="_blank">Скачать</a>
-        </div>
+<div id="edit-task-popup" class="popup">
+    <div class="popup-content">
+        <h3>Редактировать задачу</h3>
+        <form id="edit-task-form" class="popup-form">
+            <input type="hidden" name="task_id" id="edit_task_id">
+            <div class="input-group">
+                <label for="edit_task_title">Название задачи:</label>
+                <input type="text" id="edit_task_title" name="new_title" placeholder="Название задачи" class="input" required>
+            </div>
+            <div class="input-group">
+                <label for="edit_task_note">Заметка:</label>
+                <textarea id="edit_task_note" name="new_note" placeholder="Заметка" class="input"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="edit_task_deadline">Срок выполнения (ДД.ММ.ГГГГ):</label>
+                <input type="text" id="edit_task_deadline" name="new_deadline" placeholder="ДД.ММ.ГГГГ" class="input deadline-input">
+            </div>
+            <div class="input-group">
+                <label for="edit_category_id">Категория:</label>
+                <select id="edit_category_id" name="new_category_id" class="input category-select" required>
+                    <option value="">Выберите категорию</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="edit-existing-files" style="display: none;">
+                <label>Существующие файлы:</label>
+                <div class="file-list"></div>
+            </div>
+            <div class="input-group">
+                <label for="edit_task_file">Добавить файл:</label>
+                <input type="file" id="edit_task_file" name="file" class="input file-input" accept=".pdf,.docx,.png,.jpg,.jpeg,.gif,.csv,.xlsx" multiple>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <button type="button" class="btn btn-cancel" id="cancel-edit-task-btn">Отмена</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        window.deadlineEvents = {{ deadline_events|tojson|safe }};
-    </script>
-</body>
-</html>
+<div id="document-modal" class="document-modal">
+    <div class="document-modal-content">
+        <span class="document-modal-close">&times;</span>
+        <p>Выберите действие с файлом:</p>
+        <a href="#" class="document-link" target="_blank">Открыть</a>
+    </div>
+</div>
+
+<div id="change-password-popup" class="popup">
+    <div class="popup-content">
+        <h3>Изменить пароль</h3>
+        <form id="change-password-form" class="popup-form">
+            <div class="input-group">
+                <label for="current_password">Текущий пароль:</label>
+                <input type="password" id="current_password" name="current_password" class="input" required>
+            </div>
+            <div class="input-group">
+                <label for="new_password">Новый пароль:</label>
+                <input type="password" id="new_password" name="new_password" class="input" required>
+            </div>
+            <div class="input-group">
+                <label for="confirm_new_password">Повторите новый пароль:</label>
+                <input type="password" id="confirm_new_password" name="confirm_new_password" class="input" required>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Изменить</button>
+                <button type="button" class="btn btn-cancel" id="cancel-change-password-btn">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+
+<script type="module" src="{{ url_for('static', filename='js/notificationHandler.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/simpleCalendar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/categoryHandler.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/taskHandler.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

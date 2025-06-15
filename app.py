@@ -1,13 +1,23 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy  # noqa: F401
+from flask_login import LoginManager
 from views import main
-from models import db
+from models import db, User
 import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-secret-key'  # Для flash-сообщений
+
+# Инициализация Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'main.login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Конфигурация для загрузки файлов
 UPLOAD_FOLDER = 'static/uploads'
@@ -25,10 +35,22 @@ def allowed_file(filename):
 db.init_app(app)
 app.register_blueprint(main)
 
-# Создание таблиц базы данных
+# Создание таблиц базы данных и пользователей
 with app.app_context():
     db.create_all()
+    
+    # Создаем пользователей, если их еще нет
+    if not User.query.filter_by(username='user1').first():
+        user1 = User(username='user1')
+        user1.set_password('password1')
+        db.session.add(user1)
+    
+    if not User.query.filter_by(username='user2').first():
+        user2 = User(username='user2')
+        user2.set_password('password2')
+        db.session.add(user2)
+    
+    db.session.commit()
 
 if __name__ == '__main__':
-    #app.run(debug=True, port=5002)
-    pass
+    app.run(debug=True, port=5002)
