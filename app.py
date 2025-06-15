@@ -41,16 +41,17 @@ with app.app_context():
     
     # Создаем пользователей, если их еще нет
     if not User.query.filter_by(username='user1').first():
-        user1 = User(username='user1')
-        user1.set_password('password1')
+        user1 = User(username='bbokariev')
+        user1.set_password('Bbo210395')
         db.session.add(user1)
     
     if not User.query.filter_by(username='user2').first():
-        user2 = User(username='user2')
-        user2.set_password('password2')
+        user2 = User(username='szakhar')
+        user2.set_password('changeme')
         db.session.add(user2)
     
     db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
+    #pass

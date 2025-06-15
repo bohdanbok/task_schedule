@@ -4,6 +4,7 @@ import { updateCalendarWithTasks } from './simpleCalendar.js';
 export function setupTaskHandlers() {
     let draggedTask = null; // Переменная для хранения перетаскиваемой задачи
     let currentDropZone = null; // Текущая зона для сброса
+    let dragStartTime = null; // Переменная для отслеживания времени начала перетаскивания
 
     // Обработчики кликов для кнопок задач (делегирование)
     document.addEventListener('click', async function (e) {
@@ -332,45 +333,22 @@ export function setupTaskHandlers() {
     });
 
     // Обработчики событий перетаскивания для задач и контейнеров
-    document.addEventListener('dragstart', (e) => {
-        const taskItem = e.target.closest('.task-item');
-        if (taskItem) {
-            draggedTask = taskItem;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', taskItem.id); // Устанавливаем ID для передачи данных
-            taskItem.classList.add('dragging');
+    document.addEventListener('dragstart', function (e) {
+        if (e.target.classList.contains('task-item')) {
+            draggedTask = e.target;
+            dragStartTime = Date.now(); // Запоминаем время начала перетаскивания
+            e.target.classList.add('dragging');
         }
     });
 
-    document.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Разрешаем сброс
-        const taskContainer = e.target.closest('.task-container');
-        const taskItem = e.target.closest('.task-item');
-
-        // Удаляем подсветку со старой зоны, если она есть
-        if (currentDropZone && currentDropZone !== taskContainer && currentDropZone !== taskItem) {
-            currentDropZone.classList.remove('drag-over');
-        }
-
-        if (taskItem && taskItem !== draggedTask) {
-            const boundingBox = taskItem.getBoundingClientRect();
-            const offset = e.clientY - boundingBox.top;
-            if (offset < boundingBox.height / 2) {
-                taskItem.classList.add('drag-over-top');
-                taskItem.classList.remove('drag-over-bottom');
-                currentDropZone = taskItem; // Обновляем текущую зону
-            } else {
-                taskItem.classList.add('drag-over-bottom');
-                taskItem.classList.remove('drag-over-top');
-                currentDropZone = taskItem; // Обновляем текущую зону
-            }
-            if (taskContainer) taskContainer.classList.remove('drag-over'); // Убираем с контейнера
-        } else if (taskContainer) {
-            taskContainer.classList.add('drag-over');
-            currentDropZone = taskContainer; // Обновляем текущую зону
-            if (taskItem) {
-                taskItem.classList.remove('drag-over-top');
-                taskItem.classList.remove('drag-over-bottom');
+    document.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        const category = e.target.closest('.category');
+        if (category && draggedTask) {
+            const categoryHeader = category.querySelector('.category-header');
+            if (categoryHeader && e.target.closest('.category-header')) {
+                currentDropZone = category;
+                category.classList.add('drag-over');
             }
         }
     });
