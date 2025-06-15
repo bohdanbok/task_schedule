@@ -8,59 +8,88 @@ export function setupCategoryHandlers() {
         let draggedCategory = null;
 
         categoriesGrid.addEventListener('dragstart', (e) => {
-            if (e.target.classList.contains('category')) {
-                draggedCategory = e.target;
-                e.target.classList.add('dragging');
+            const category = e.target.closest('.category');
+            if (category) {
+                draggedCategory = category;
+                draggedCategory.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', e.target.id); // Устанавливаем ID для переноса данных
+                e.dataTransfer.setData('text/plain', draggedCategory.id);
             }
+        });
+
+        categoriesGrid.addEventListener('dragend', (e) => {
+            if (draggedCategory) {
+                draggedCategory.classList.remove('dragging');
+                draggedCategory = null;
+            }
+            // Удаляем все классы drag-over
+            document.querySelectorAll('.category.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
         });
 
         categoriesGrid.addEventListener('dragover', (e) => {
             e.preventDefault();
-            if (e.target.classList.contains('category') && draggedCategory) {
-                const targetCategory = e.target;
-                const boundingBox = targetCategory.getBoundingClientRect();
-                const offset = e.clientY - boundingBox.top;
+            if (!draggedCategory) return;
 
-                if (offset < boundingBox.height / 2) {
+            const targetCategory = e.target.closest('.category');
+            if (targetCategory && targetCategory !== draggedCategory) {
+                const rect = targetCategory.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+
+                // Удаляем предыдущие классы
+                document.querySelectorAll('.category.drag-over').forEach(el => {
+                    el.classList.remove('drag-over');
+                });
+
+                if (e.clientY < midY) {
+                    targetCategory.classList.add('drag-over');
                     categoriesGrid.insertBefore(draggedCategory, targetCategory);
                 } else {
+                    targetCategory.classList.add('drag-over');
                     categoriesGrid.insertBefore(draggedCategory, targetCategory.nextSibling);
                 }
             }
         });
 
-        categoriesGrid.addEventListener('dragend', async (e) => {
-            if (draggedCategory) {
-                draggedCategory.classList.remove('dragging');
-                draggedCategory = null;
-                
-                const newOrder = Array.from(categoriesGrid.children)
-                                    .filter(el => el.classList.contains('category'))
-                                    .map(cat => cat.id.split('-')[1]);
-                
-                console.log('New category order:', newOrder);
+        categoriesGrid.addEventListener('dragleave', (e) => {
+            const category = e.target.closest('.category');
+            if (category && !category.contains(e.relatedTarget)) {
+                category.classList.remove('drag-over');
+            }
+        });
 
+        categoriesGrid.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            if (!draggedCategory) return;
+
+            // Удаляем все классы drag-over
+            document.querySelectorAll('.category.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+
+            const newOrder = Array.from(categoriesGrid.children)
+                .filter(el => el.classList.contains('category'))
+                .map(cat => cat.id.split('-')[1]);
+
+            try {
                 const formData = new FormData();
                 newOrder.forEach(id => formData.append('order[]', id));
 
-                try {
-                    const response = await fetch('/update_category_order', {
-                        method: 'POST',
-                        body: formData,
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        showNotification('Порядок категорий успешно обновлен!', 'success');
-                    } else {
-                        showNotification('Ошибка при обновлении порядка категорий: ' + data.message, 'error');
-                    }
-                } catch (error) {
-                    console.error('Error updating category order:', error);
-                    showNotification('Произошла ошибка при обновлении порядка категорий.', 'error');
+                const response = await fetch('/update_category_order', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Порядок категорий успешно обновлен!', 'success');
+                } else {
+                    showNotification('Ошибка при обновлении порядка категорий: ' + data.message, 'error');
                 }
+            } catch (error) {
+                console.error('Error updating category order:', error);
+                showNotification('Произошла ошибка при обновлении порядка категорий.', 'error');
             }
         });
     }

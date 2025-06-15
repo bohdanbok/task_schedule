@@ -184,10 +184,17 @@ body {
 
 /* Стили категорий */
 .categories-grid {
-    /* display: grid; */
-    /* grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); */
+    display: grid; /* Возвращаем двухколоночный макет */
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* Возвращаем двухколоночный макет */
     gap: 25px;
-    align-items: flex-start;
+    padding: 20px;
+    align-items: start;
+    /* opacity: 0; */ /* Изначально скрываем сетку */
+    /* transition: opacity 0.3s ease-in-out; */ /* Плавное появление */
+}
+
+.categories-grid.masonry-loaded {
+    /* opacity: 1; */ /* Показываем сетку после загрузки Masonry */
 }
 
 .category {
@@ -197,6 +204,8 @@ body {
     padding: 15px;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* width: 450px; */ /* Устанавливаем фиксированную ширину для Masonry */
+    /* box-sizing: border-box; */ /* Включаем padding и border в ширину */
 }
 
 .category:hover {

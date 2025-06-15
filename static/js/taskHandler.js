@@ -2,9 +2,143 @@ import { showNotification } from './notificationHandler.js';
 import { updateCalendarWithTasks } from './simpleCalendar.js';
 
 export function setupTaskHandlers() {
-    let draggedTask = null; // Переменная для хранения перетаскиваемой задачи
-    let currentDropZone = null; // Текущая зона для сброса
-    let dragStartTime = null; // Переменная для отслеживания времени начала перетаскивания
+    let draggedTask = null;
+    let currentDropZone = null;
+
+    // Обработчики перетаскивания задач
+    document.addEventListener('dragstart', (e) => {
+        const taskItem = e.target.closest('.task-item');
+        if (taskItem) {
+            draggedTask = taskItem;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedTask.id);
+            setTimeout(() => {
+                draggedTask.classList.add('dragging');
+            }, 0);
+        }
+    });
+
+    document.addEventListener('dragend', (e) => {
+        if (draggedTask) {
+            draggedTask.classList.remove('dragging');
+            draggedTask = null;
+        }
+        // Удаляем все классы drag-over
+        document.querySelectorAll('.task-container.drag-over').forEach(el => {
+            el.classList.remove('drag-over');
+        });
+        document.querySelectorAll('.task-item.drag-over-top, .task-item.drag-over-bottom').forEach(el => {
+            el.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+    });
+
+    document.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!draggedTask) return;
+
+        const taskContainer = e.target.closest('.task-container');
+        const taskItem = e.target.closest('.task-item');
+
+        if (taskContainer) {
+            taskContainer.classList.add('drag-over');
+            currentDropZone = taskContainer;
+        }
+
+        if (taskItem && taskItem !== draggedTask) {
+            const rect = taskItem.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            // Удаляем предыдущие классы
+            document.querySelectorAll('.task-item.drag-over-top, .task-item.drag-over-bottom').forEach(el => {
+                el.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
+            if (e.clientY < midY) {
+                taskItem.classList.add('drag-over-top');
+            } else {
+                taskItem.classList.add('drag-over-bottom');
+            }
+        }
+    });
+
+    document.addEventListener('dragleave', (e) => {
+        const taskContainer = e.target.closest('.task-container');
+        if (taskContainer && !taskContainer.contains(e.relatedTarget)) {
+            taskContainer.classList.remove('drag-over');
+        }
+    });
+
+    document.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        if (!draggedTask) return;
+
+        const taskContainer = e.target.closest('.task-container');
+        const taskItem = e.target.closest('.task-item');
+
+        // Удаляем все классы drag-over
+        document.querySelectorAll('.task-container.drag-over').forEach(el => {
+            el.classList.remove('drag-over');
+        });
+        document.querySelectorAll('.task-item.drag-over-top, .task-item.drag-over-bottom').forEach(el => {
+            el.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+
+        if (taskContainer) {
+            const newCategoryId = taskContainer.id.replace('task-container-', '');
+            let previousTaskId = null;
+            let nextTaskId = null;
+            let position = 'end';
+
+            if (taskItem && taskItem !== draggedTask) {
+                const rect = taskItem.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+
+                if (e.clientY < midY) {
+                    taskContainer.insertBefore(draggedTask, taskItem);
+                    previousTaskId = draggedTask.previousElementSibling?.dataset.taskId;
+                    nextTaskId = taskItem.dataset.taskId;
+                    position = 'before';
+                } else {
+                    taskContainer.insertBefore(draggedTask, taskItem.nextElementSibling);
+                    previousTaskId = taskItem.dataset.taskId;
+                    nextTaskId = draggedTask.nextElementSibling?.dataset.taskId;
+                    position = 'after';
+                }
+            } else {
+                taskContainer.appendChild(draggedTask);
+                previousTaskId = draggedTask.previousElementSibling?.dataset.taskId;
+            }
+
+            try {
+                const response = await fetch('/update_task_position', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        task_id: draggedTask.dataset.taskId,
+                        new_category_id: newCategoryId,
+                        previous_task_id: previousTaskId,
+                        next_task_id: nextTaskId,
+                        position: position
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Позиция задачи успешно обновлена!', 'success');
+                    if (window.updateCalendarEvents) {
+                        window.updateCalendarEvents();
+                    }
+                } else {
+                    showNotification('Ошибка при обновлении позиции задачи: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Произошла ошибка при обновлении позиции задачи.', 'error');
+            }
+        }
+    });
 
     // Обработчики кликов для кнопок задач (делегирование)
     document.addEventListener('click', async function (e) {
@@ -207,6 +341,14 @@ export function setupTaskHandlers() {
         e.preventDefault();
         const form = e.target;
         const taskId = document.getElementById('edit_task_id').value;
+        console.log('Отправка формы редактирования задачи. taskId:', taskId); // Отладочное сообщение
+
+        if (!taskId) {
+            showNotification('Ошибка: ID задачи не определен для редактирования.', 'error');
+            console.error('Ошибка: taskId undefined при отправке формы edit-task-form');
+            return;
+        }
+
         const formData = new FormData(form);
 
         // Добавляем существующие файлы, которые НЕ отмечены для удаления
@@ -250,73 +392,124 @@ export function setupTaskHandlers() {
                     if (!deadlineElement) {
                         deadlineElement = document.createElement('p');
                         deadlineElement.textContent = 'До:';
-                        // Добавляем после заметки, если есть, или после заголовка
-                        if (noteElement && noteElement.parentNode === taskDisplay) { // Проверяем, что noteElement все еще в DOM
-                            noteElement.insertAdjacentElement('afterend', deadlineElement);
-                        } else {
-                            taskDisplay.querySelector('strong').insertAdjacentElement('afterend', deadlineElement);
+                        // Добавляем после заметки или заголовка
+                        const insertAfter = noteElement || taskDisplay.querySelector('strong');
+                        if (insertAfter) {
+                            insertAfter.insertAdjacentElement('afterend', deadlineElement);
                         }
                     }
 
                     if (data.deadline) {
                         deadlineElement.textContent = `До: ${data.deadline}`;
-                        deadlineElement.setAttribute('data-type', 'deadline'); // Устанавливаем data-type
                     } else {
                         deadlineElement.remove();
                     }
 
-                    // Обновление атрибута data-task-deadline для task-item
-                    const taskItem = document.getElementById(`task-${taskId}`);
-                    if (taskItem) {
-                        if (data.deadline) {
-                            taskItem.setAttribute('data-task-deadline', data.deadline);
-                        } else {
-                            taskItem.removeAttribute('data-task-deadline');
-                        }
-                    }
-
-                    // Обновление файлов
-                    const existingFilesContainer = taskDisplay.querySelector('.file-list');
+                    // Обновляем прикрепленные файлы
+                    const existingFilesContainer = document.getElementById('edit-existing-files');
                     if (existingFilesContainer) {
-                        existingFilesContainer.innerHTML = ''; // Очищаем существующие
+                        existingFilesContainer.innerHTML = ''; // Очищаем старые файлы
 
                         if (data.file_urls && data.file_urls.length > 0) {
+                            const fileList = document.createElement('div');
+                            fileList.classList.add('file-list');
+
                             data.file_urls.split(',').forEach(fileUrl => {
                                 if (!fileUrl) return;
-                                const filename = fileUrl.split('/').pop().split('_', 1)[1] || fileUrl.split('/').pop();
+                                const filename = fileUrl.split('/').pop().split('_', 2)[1] || fileUrl.split('/').pop();
                                 const isImage = fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif)$/);
                                 const isDocument = fileUrl.toLowerCase().match(/\.(pdf|docx|csv|xlsx)$/);
 
+                                const fileItem = document.createElement('div');
+                                fileItem.classList.add('file-item');
+                                fileItem.dataset.fileUrl = fileUrl; // Сохраняем полный URL для удаления
+
                                 if (isImage) {
-                                    existingFilesContainer.insertAdjacentHTML('beforeend', `<img src="${fileUrl}" alt="${filename}" class="task-image" data-full-url="${fileUrl}">`);
+                                    fileItem.innerHTML = `
+                                        <img src="${fileUrl}" alt="${filename}" class="task-image" data-full-url="${fileUrl}">
+                                        <button type="button" class="delete-file" data-file-url="${fileUrl}" title="Удалить файл">✕</button>
+                                    `;
                                 } else if (isDocument) {
-                                    existingFilesContainer.insertAdjacentHTML('beforeend', `<a href="#" class="file-link" data-file-url="${fileUrl}">${filename}</a>`);
+                                    fileItem.innerHTML = `
+                                        <a href="#" class="file-link" data-file-url="${fileUrl}">${filename}</a>
+                                        <button type="button" class="delete-file" data-file-url="${fileUrl}" title="Удалить файл">✕</button>
+                                    `;
+                                }
+                                
+                                fileList.appendChild(fileItem);
+                            });
+                            
+                            existingFilesContainer.appendChild(fileList);
+                        } else {
+                            existingFilesContainer.style.display = 'none';
+                        }
+
+                        // Добавляем обработчики для кнопок удаления файлов
+                        document.querySelectorAll('#edit-existing-files .delete-file').forEach(button => {
+                            button.addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                const fileUrl = button.dataset.fileUrl;
+                                const fileItem = button.closest('.file-item');
+                                
+                                try {
+                                    const response = await fetch(`/delete_task_file/${taskId}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        },
+                                        body: JSON.stringify({ file_url: fileUrl })
+                                    });
+                                    
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        fileItem.remove();
+                                        showNotification('Файл успешно удален!', 'success');
+                                        
+                                        // Если это был последний файл, скрываем контейнер
+                                        if (existingFilesContainer.querySelectorAll('.file-item').length === 0) {
+                                            existingFilesContainer.style.display = 'none';
+                                        }
+                                    } else {
+                                        showNotification('Ошибка при удалении файла: ' + data.message, 'error');
+                                    }
+                                } catch (error) {
+                                    console.error('Error deleting file:', error);
+                                    showNotification('Произошла ошибка при удалении файла.', 'error');
                                 }
                             });
-                        }
-                    } else if (data.file_urls && data.file_urls.length > 0) {
-                        // Если контейнера не было, но файлы есть, создаем его
-                        const newFileList = document.createElement('div');
-                        newFileList.classList.add('file-list');
-                        taskDisplay.appendChild(newFileList);
-                        data.file_urls.split(',').forEach(fileUrl => {
-                            if (!fileUrl) return;
-                            const filename = fileUrl.split('/').pop().split('_', 1)[1] || fileUrl.split('/').pop();
-                            const isImage = fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif)$/);
-                            const isDocument = fileUrl.toLowerCase().match(/\.(pdf|docx|csv|xlsx)$/);
-
-                            if (isImage) {
-                                newFileList.insertAdjacentHTML('beforeend', `<img src="${fileUrl}" alt="${filename}" class="task-image" data-full-url="${fileUrl}">`);
-                            } else if (isDocument) {
-                                newFileList.insertAdjacentHTML('beforeend', `<a href="#" class="file-link" data-file-url="${fileUrl}">${filename}</a>`);
-                            }
                         });
-                    }
 
-                    showNotification('Задача успешно обновлена!', 'success');
+                        // Обновляем отображение текущих файлов в задаче
+                        const currentTaskFilesDisplay = document.querySelector(`#task-display-${taskId} .file-list`);
+                        if (currentTaskFilesDisplay) {
+                            currentTaskFilesDisplay.innerHTML = '';
+                            if (data.file_urls && data.file_urls.length > 0) {
+                                data.file_urls.split(',').forEach(fileUrl => {
+                                    if (!fileUrl) return;
+                                    const filename = fileUrl.split('/').pop().split('_', 2)[1] || fileUrl.split('/').pop();
+                                    const isImage = fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif)$/);
+                                    const isDocument = fileUrl.toLowerCase().match(/\.(pdf|docx|csv|xlsx)$/);
+
+                                    if (isImage) {
+                                        currentTaskFilesDisplay.innerHTML += `<img src="${fileUrl}" alt="${filename}" class="task-image" data-full-url="${fileUrl}">`;
+                                    } else if (isDocument) {
+                                        currentTaskFilesDisplay.innerHTML += `<a href="#" class="file-link" data-file-url="${fileUrl}">${filename}</a>`;
+                                    }
+                                });
+                            }
+                        }
+                    }
                 }
+
                 document.getElementById('edit-task-popup').style.display = 'none';
-                form.reset();
+                showNotification('Задача успешно обновлена!', 'success');
+                
+                // Обновляем отображение задач в категории, чтобы новые файлы отобразились
+                const categoryId = data.category_id; // Предполагаем, что backend возвращает category_id
+                if (categoryId) {
+                    updateTasksDisplayInContainer(categoryId);
+                }
 
                 // Обновляем календарь после редактирования задачи
                 if (window.updateCalendarEvents) {
@@ -324,241 +517,132 @@ export function setupTaskHandlers() {
                 }
 
             } else {
-                showNotification('Ошибка при обновлении задачи: ' + (data.message || 'Неизвестная ошибка.'), 'error');
+                showNotification('Ошибка при редактировании задачи: ' + data.message, 'error');
             }
         } catch (error) {
-            console.error('Error updating task:', error);
-            showNotification('Произошла ошибка при обновлении задачи.', 'error');
+            console.error('Error:', error);
+            showNotification('Произошла ошибка при редактировании задачи.', 'error');
         }
     });
+}
 
-    // Обработчики событий перетаскивания для задач и контейнеров
-    document.addEventListener('dragstart', function (e) {
-        if (e.target.classList.contains('task-item')) {
-            draggedTask = e.target;
-            dragStartTime = Date.now(); // Запоминаем время начала перетаскивания
-            e.target.classList.add('dragging');
-        }
-    });
+// Функция для обновления отображения задач в контейнере категории
+export async function updateTasksDisplayInContainer(categoryId) {
+    try {
+        const response = await fetch(`/get_tasks_by_category/${categoryId}`);
+        const data = await response.json();
 
-    document.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        const category = e.target.closest('.category');
-        if (category && draggedTask) {
-            const categoryHeader = category.querySelector('.category-header');
-            if (categoryHeader && e.target.closest('.category-header')) {
-                currentDropZone = category;
-                category.classList.add('drag-over');
-            }
-        }
-    });
+        if (data.success) {
+            const taskContainer = document.getElementById(`task-container-${categoryId}`);
+            if (taskContainer) {
+                taskContainer.innerHTML = ''; // Очищаем текущие задачи
+                if (data.tasks.length === 0) {
+                    taskContainer.innerHTML = '<p class="no-tasks-message">Задачи отсутствуют</p>';
+                } else {
+                    data.tasks.forEach(task => {
+                        console.log('Данные задачи для отрисовки:', task); // Добавлено для отладки
+                        const deadlineAttr = task.deadline ? `data-task-deadline="${task.deadline}"` : '';
+                        const taskHtml = `
+                            <div class="task-item" id="task-${task.id}" data-task-id="${task.id}" draggable="true" ${deadlineAttr}>
+                                <div class="task-content">
+                                    <div id="task-display-${task.id}">
+                                        <strong class="${task.completed ? 'completed' : ''}">${task.title ?? ''}</strong>
+                                        ${task.note ? `<p>Заметка: ${task.note ?? ''}</p>` : ''}
+                                        ${task.deadline ? `<p>До: ${task.deadline ?? ''}</p>` : ''}
+                                        <p>Создано: ${task.created_at ?? ''}</p>
+                                        ${task.file_urls && task.file_urls.length > 0 ? `
+                                            <div class="file-list">
+                                                ${task.file_urls.split(',').map(fileUrl => {
+                                                    if (!fileUrl) return '';
+                                                    const filename = fileUrl.split('/').pop().split('_', 1)[1] || fileUrl.split('/').pop();
+                                                    const isImage = fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif)$/);
+                                                    const isDocument = fileUrl.toLowerCase().match(/\.(pdf|docx|csv|xlsx)$/);
 
-    document.addEventListener('dragleave', (e) => {
-        // Убираем подсветку со всех возможных элементов
-        document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-        document.querySelectorAll('.task-container').forEach(container => {
-            container.classList.remove('drag-over');
-        });
-        currentDropZone = null;
-    });
-
-    document.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        if (!draggedTask) return;
-
-        const oldCategoryContainer = draggedTask.closest('.task-container');
-        const newCategoryContainer = e.target.closest('.task-container');
-        const targetTaskItem = e.target.closest('.task-item');
-
-        // Убираем все визуальные индикаторы
-        document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-        document.querySelectorAll('.task-container').forEach(container => {
-            container.classList.remove('drag-over');
-        });
-        currentDropZone = null;
-
-        if (!newCategoryContainer) return; // Сброс вне допустимой зоны
-
-        const draggedTaskId = draggedTask.dataset.taskId;
-        const oldCategoryId = oldCategoryContainer.id.split('-')[2];
-        const newCategoryId = newCategoryContainer.id.split('-')[2];
-
-        let targetTaskId = null;
-        let position = null;
-
-        if (targetTaskItem && targetTaskItem !== draggedTask) {
-            targetTaskId = targetTaskItem.dataset.taskId;
-            const boundingBox = targetTaskItem.getBoundingClientRect();
-            const offset = e.clientY - boundingBox.top;
-            position = (offset < boundingBox.height / 2) ? 'before' : 'after';
-        } else if (newCategoryContainer.children.length === 0 || (newCategoryContainer.children.length === 1 && draggedTask.parentNode === newCategoryContainer)) {
-            // Если категория пуста или содержит только перетаскиваемую задачу, помещаем в начало
-            position = 'start';
-        } else if (!targetTaskItem && newCategoryContainer.lastElementChild && newCategoryContainer.lastElementChild.classList.contains('task-item')) {
-             // Если сброшено в пустую область контейнера, и в нем уже есть задачи, ставим в конец
-            position = 'end';
-        }
-
-        try {
-            const response = await fetch('/update_task_position', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    task_id: draggedTaskId,
-                    new_category_id: newCategoryId,
-                    target_task_id: targetTaskId,
-                    position: position
-                })
-            });
-            const data = await response.json();
-            if (data.success) {
-                showNotification('Порядок задач успешно обновлен!', 'success');
-                // Перерендеринг задач, чтобы обновить их порядок
-                // Мы должны перерендерить обе категории, если задача переместилась
-                if (oldCategoryId !== newCategoryId) {
-                    await updateTasksDisplayInContainer(oldCategoryId); // Обновляем старую категорию
-                }
-                await updateTasksDisplayInContainer(newCategoryId); // Обновляем новую категорию
-
-                 // Обновляем календарь
-                 if (window.updateCalendarEvents) {
-                    window.updateCalendarEvents();
-                 }
-
-            } else {
-                showNotification('Ошибка при обновлении порядка задач: ' + data.message, 'error');
-            }
-        } catch (error) {
-            console.error('Error updating task position:', error);
-            showNotification('Произошла ошибка при обновлении порядка задач.', 'error');
-        }
-    });
-
-    document.addEventListener('dragend', (e) => {
-        if (draggedTask) {
-            draggedTask.classList.remove('dragging');
-            draggedTask = null;
-        }
-         // Убираем подсветку со всех возможных элементов в конце перетаскивания
-         document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-        document.querySelectorAll('.task-container').forEach(container => {
-            container.classList.remove('drag-over');
-        });
-        currentDropZone = null;
-    });
-
-    // Вспомогательная функция для обновления отображения задач в контейнере
-    async function updateTasksDisplayInContainer(categoryId) {
-        try {
-            const response = await fetch(`/get_tasks_by_category/${categoryId}`);
-            const data = await response.json();
-            if (data.success) {
-                const taskContainer = document.getElementById(`task-container-${categoryId}`);
-                if (taskContainer) {
-                    taskContainer.innerHTML = ''; // Очищаем текущие задачи
-                    if (data.tasks.length === 0) {
-                        taskContainer.innerHTML = '<p class="no-tasks-message">Задачи отсутствуют</p>';
-                    } else {
-                        data.tasks.forEach(task_data => {
-                            const task = task_data.task;
-                            const file_urls_html = task_data.files.length > 0 ? `
-                                <div class="file-list">
-                                    ${task_data.files.map(file => {
-                                        if (!file.url) return '';
-                                        const filename = file.filename;
-                                        const isImage = file.is_image;
-                                        const isDocument = file.is_document;
-                                        if (isImage) {
-                                            return `<img src="${file.url}" alt="${filename}" class="task-image" data-full-url="${file.url}">`;
-                                        } else if (isDocument) {
-                                            return `<a href="#" class="file-link" data-file-url="${file.url}">${filename}</a>`;
-                                        }
-                                        return '';
-                                    }).join('')}
+                                                    if (isImage) {
+                                                        return `<img src="${fileUrl}" alt="${filename}" class="task-image" data-full-url="${fileUrl}">`;
+                                                    } else if (isDocument) {
+                                                        return `<a href="#" class="file-link" data-file-url="${fileUrl}">${filename}</a>`;
+                                                    }
+                                                    return '';
+                                                }).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
                                 </div>
-                            ` : '';
-
-                            const deadlineAttr = task.deadline ? `data-task-deadline="${task.deadline}"` : '';
-                            const taskHtml = `
-                                <div class="task-item" id="task-${task.id}" data-task-id="${task.id}" draggable="true" ${deadlineAttr}>
-                                    <div class="task-content">
-                                        <div id="task-display-${task.id}">
-                                            <strong class="${task.completed ? 'completed' : ''}">${task.title}</strong>
-                                            ${task.note ? `<p>Заметка: ${task.note}</p>` : ''}
-                                            ${task.deadline ? `<p>До: ${task.deadline}</p>` : ''}
-                                            <p>Создано: ${task.created_at}</p>
-                                            ${file_urls_html}
-                                        </div>
-                                    </div>
-                                    <div class="task-actions">
-                                        <button class="edit-task-button btn-action" data-task-id="${task.id}" title="Редактировать задачу">✏️</button>
-                                        <button class="toggle-task btn-action" data-task-id="${task.id}" title="${task.completed ? 'Возобновить' : 'Завершить'}">${task.completed ? '↺' : '✓'}</button>
-                                        <button class="delete-task btn-action btn-action-danger" data-task-id="${task.id}" title="Удалить">✕</button>
-                                    </div>
-                                </div>`;
-                            taskContainer.insertAdjacentHTML('beforeend', taskHtml);
-                        });
-                    }
+                                <div class="task-actions">
+                                    <button class="edit-task-button btn-action" data-task-id="${task.id}" title="Редактировать задачу">✏️</button>
+                                    <button class="toggle-task btn-action" data-task-id="${task.id}" title="${task.completed ? 'Возобновить' : 'Завершить'}">${task.completed ? '↺' : '✓'}</button>
+                                    <button class="delete-task btn-action btn-action-danger" data-task-id="${task.id}" title="Удалить">✕</button>
+                                </div>
+                            </div>`;
+                        taskContainer.insertAdjacentHTML('beforeend', taskHtml);
+                    });
                 }
-            } else {
-                showNotification('Ошибка при получении задач для категории: ' + data.message, 'error');
             }
-        } catch (error) {
-            console.error('Error fetching tasks for category:', error);
-            showNotification('Произошла ошибка при получении задач для категории.', 'error');
+        } else {
+            console.error('Ошибка при получении задач по категории:', data.message);
         }
+    } catch (error) {
+        console.error('Произошла ошибка при загрузке задач:', error);
     }
 }
 
-async function openEditTaskPopup(taskId) {
+// Функция для открытия попапа редактирования задачи и заполнения данными
+export async function openEditTaskPopup(taskId) {
     try {
         const response = await fetch(`/get_task_details/${taskId}`);
         const data = await response.json();
-        if (data.success) {
-            const form = document.getElementById('edit-task-form');
-            form.querySelector('#edit_task_id').value = taskId;
-            form.querySelector('#edit_task_title').value = data.task.title;
-            form.querySelector('#edit_task_note').value = data.task.note || '';
-            form.querySelector('#edit_task_deadline').value = data.task.deadline || '';
-            form.querySelector('#edit_category_id').value = data.task.category_id;
 
-            // Обновляем список существующих файлов
+        if (data.success && data.task) {
+            const task = data.task; // Получаем объект задачи
+            const files = data.files || []; // Получаем массив файлов
+
+            document.getElementById('edit_task_id').value = task.id;
+            console.log('Значение edit_task_id установлено на:', document.getElementById('edit_task_id').value); // Отладочное сообщение
+            document.getElementById('edit_task_title').value = task.title;
+            document.getElementById('edit_task_note').value = task.note || '';
+            document.getElementById('edit_category_id').value = task.category_id;
+            document.getElementById('edit_task_deadline').value = task.deadline || '';
+
+            // Заполняем поле даты для Flatpickr
+            const editTaskDeadlineInput = document.getElementById('edit_task_deadline');
+            if (editTaskDeadlineInput && editTaskDeadlineInput._flatpickr) {
+                editTaskDeadlineInput._flatpickr.setDate(task.deadline || '');
+            }
+
+            // Отображаем прикрепленные файлы
             const existingFilesContainer = document.getElementById('edit-existing-files');
-            existingFilesContainer.innerHTML = '';
-            
-            if (data.files && data.files.length > 0) {
+            existingFilesContainer.innerHTML = ''; // Очищаем предыдущие файлы
+
+            if (files.length > 0) {
                 existingFilesContainer.style.display = 'block';
                 const fileList = document.createElement('div');
-                fileList.className = 'file-list';
-                
-                data.files.forEach(fileInfo => {
-                    const fileUrl = fileInfo.url;
-                    if (!fileUrl) return;
-                    const filename = fileInfo.filename || fileUrl.split('/').pop().split('_', 1)[1] || fileUrl.split('/').pop();
-                    const isImage = fileUrl.toLowerCase().match(/\.(jpeg|jpg|png|gif)$/);
-                    const isDocument = fileUrl.toLowerCase().match(/\.(pdf|docx|csv|xlsx)$/);
-                    
+                fileList.classList.add('file-list');
+
+                files.forEach(file => {
+                    // Более строгая проверка объекта файла и его свойства URL
+                    if (!file || typeof file.url !== 'string' || file.url === '') {
+                        console.warn('Пропускаем некорректный объект файла:', file);
+                        return; // Пропускаем, если файл или его URL некорректны
+                    }
+                    console.log('Обрабатываем файл:', file); // Логируем объект файла
                     const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    
+                    fileItem.classList.add('file-item');
+                    fileItem.dataset.fileUrl = file.url; // Сохраняем полный URL для удаления
+
+                    const filename = file.url.split('/').pop().split('_', 2)[1] || file.url.split('/').pop(); // Получаем исходное имя файла
+                    const isImage = file.url.toLowerCase().match(/\.(jpeg|jpg|png|gif)$/);
+                    const isDocument = file.url.toLowerCase().match(/\.(pdf|docx|csv|xlsx)$/);
+
                     if (isImage) {
                         fileItem.innerHTML = `
-                            <img src="${fileUrl}" alt="${filename}" class="task-image" data-full-url="${fileUrl}">
-                            <button type="button" class="delete-file" data-file-url="${fileUrl}" title="Удалить файл">✕</button>
+                            <img src="${file.url}" alt="${filename}" class="task-image" data-full-url="${file.url}">
+                            <button type="button" class="delete-file" data-file-url="${file.url}" title="Удалить файл">✕</button>
                         `;
                     } else if (isDocument) {
                         fileItem.innerHTML = `
-                            <a href="#" class="file-link" data-file-url="${fileUrl}">${filename}</a>
-                            <button type="button" class="delete-file" data-file-url="${fileUrl}" title="Удалить файл">✕</button>
+                            <a href="#" class="file-link" data-file-url="${file.url}">${filename}</a>
+                            <button type="button" class="delete-file" data-file-url="${file.url}" title="Удалить файл">✕</button>
                         `;
                     }
                     
@@ -571,7 +655,7 @@ async function openEditTaskPopup(taskId) {
             }
 
             // Добавляем обработчики для кнопок удаления файлов
-            document.querySelectorAll('.delete-file').forEach(button => {
+            document.querySelectorAll('#edit-existing-files .delete-file').forEach(button => {
                 button.addEventListener('click', async (e) => {
                     e.preventDefault();
                     const fileUrl = button.dataset.fileUrl;
@@ -614,4 +698,4 @@ async function openEditTaskPopup(taskId) {
         console.error('Error:', error);
         showNotification('Произошла ошибка при получении данных задачи.', 'error');
     }
-} 
+}

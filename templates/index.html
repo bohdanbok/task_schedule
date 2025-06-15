@@ -48,7 +48,7 @@
                                 <div id="task-display-{{ task.id }}">
                                     <strong class="{{ 'completed' if task.completed else '' }}">{{ task.title }}</strong>
                                     {% if task.note %}
-                                        <p>{{ task.note }}</p>
+                                        <p>Заметка: {{ task.note }}</p>
                                     {% endif %}
                                     {% if task.deadline %}
                                         <p>До: {{ task.deadline.strftime('%d.%m.%Y') }}</p>
@@ -66,11 +66,10 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                <!-- Удалена встроенная форма редактирования задачи -->
                             </div>
                             <div class="task-actions">
                                 <button class="edit-task-button btn-action" data-task-id="{{ task.id }}" title="Редактировать задачу">✏️</button>
-                                <button class="toggle-task btn-action" data-task-id="{{ task.id }}" title="{{ 'Возобновить' if task.completed else 'Завершить' }}">{% if task.completed %}↺{% else %}✓{% endif %}</button>
+                                <button class="toggle-task btn-action" data-task-id="{{ task.id }}" title="{{ 'Возобновить' if task.completed else 'Завершить' }}">{{ '↺' if task.completed else '✓' }}</button>
                                 <button class="delete-task btn-action btn-action-danger" data-task-id="{{ task.id }}" title="Удалить">✕</button>
                             </div>
                         </div>
@@ -248,12 +247,4 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-
-<script type="module" src="{{ url_for('static', filename='js/notificationHandler.js') }}"></script>
-<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
-<script src="{{ url_for('static', filename='js/simpleCalendar.js') }}"></script>
-<script src="{{ url_for('static', filename='js/categoryHandler.js') }}"></script>
-<script src="{{ url_for('static', filename='js/taskHandler.js') }}"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

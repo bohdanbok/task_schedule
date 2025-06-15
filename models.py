@@ -30,7 +30,7 @@ class Task(db.Model):
     created_at = db.Column(db.Date, nullable=False)
     order = db.Column(db.Integer, default=0, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     file_urls = db.Column(db.String(1024), nullable=True)  # Список URL через запятую
     category = db.relationship('Category', backref=db.backref('tasks', lazy=True))
     user = db.relationship('User', backref=db.backref('tasks', lazy=True))

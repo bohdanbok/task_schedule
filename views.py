@@ -36,7 +36,12 @@ def logout():
 @login_required
 def index():
     categories = Category.query.order_by(Category.order).all()
-    tasks_by_cat = {cat.id: Task.query.filter_by(category_id=cat.id, user_id=current_user.id).order_by(Task.order).all() for cat in categories}
+    tasks_by_cat = {
+        cat.id: Task.query.filter_by(category_id=cat.id)
+        .order_by(Task.order)
+        .all() 
+        for cat in categories
+    }
 
     tasks_by_cat_with_files = {}
     for cat_id, tasks in tasks_by_cat.items():
@@ -108,13 +113,27 @@ def edit_category_color(cat_id):
 
 
 @main.route('/update_category_order', methods=['POST'])
+@login_required
 def update_category_order():
-    order = request.form.getlist('order[]')
-    for idx, cat_id in enumerate(order):
-        category = Category.query.get(cat_id)
-        category.order = idx
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        order = request.form.getlist('order[]')
+        if not order:
+            return jsonify({'success': False, 'message': 'Не получен порядок категорий'}), 400
+
+        # Обновляем порядок для каждой категории
+        for idx, cat_id in enumerate(order):
+            category = Category.query.get(cat_id)
+            if category:
+                category.order = idx
+            else:
+                return jsonify({'success': False, 'message': f'Категория с ID {cat_id} не найдена'}), 404
+
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Ошибка при обновлении порядка категорий: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @main.route('/delete_category/<int:cat_id>', methods=['POST'])
@@ -160,7 +179,6 @@ def add_task():
         deadline=deadline,
         created_at=date.today(),
         category_id=int(data['category_id']),
-        user_id=current_user.id,
         order=new_order, # Присваиваем определенный порядок
         file_urls=file_urls_str
     )
@@ -238,12 +256,16 @@ def edit_task(task_id):
     print(f"Edited task {task.id} with files: {task.file_urls}")
     return jsonify({
         'success': True,
-        'title': task.title,
-        'note': task.note,
-        'deadline': task.deadline.strftime('%Y-%m-%d') if task.deadline else None,
-        'file_urls': task.file_urls,
-        'completed': task.completed,
-        'category_id': task.category_id # Добавляем category_id для обновления JS
+        'task': {
+            'id': task.id,
+            'title': task.title,
+            'note': task.note,
+            'deadline': task.deadline.strftime('%Y-%m-%d') if task.deadline else None,
+            'completed': task.completed,
+            'created_at': task.created_at.strftime('%Y-%m-%d'),
+            'category_id': task.category_id
+        },
+        'file_urls': task.file_urls
     })
 
 
@@ -273,6 +295,7 @@ def get_task_details(task_id):
     return jsonify({
         'success': True,
         'task': {
+            'id': task.id,
             'title': task.title,
             'note': task.note,
             'deadline': task.deadline.strftime('%d.%m.%Y') if task.deadline else None,
@@ -317,9 +340,12 @@ def get_all_tasks():
         'tasks': [{
             'id': task.id,
             'title': task.title,
+            'note': task.note,
             'deadline': task.deadline.strftime('%Y-%m-%d') if task.deadline else None,
             'completed': task.completed,
-            'category_id': task.category_id
+            'created_at': task.created_at.strftime('%Y-%m-%d'),
+            'category_id': task.category_id,
+            'file_urls': task.file_urls
         } for task in tasks]
     })
 
@@ -335,8 +361,8 @@ def delete_task_file(task_id):
             return jsonify({'success': False, 'message': 'URL файла не указан'})
             
         task = Task.query.get_or_404(task_id)
-        if task.user_id != current_user.id:
-            return jsonify({'success': False, 'message': 'Нет доступа к этой задаче'})
+        # if task.user_id != current_user.id:
+        #     return jsonify({'success': False, 'message': 'Нет доступа к этой задаче'})
             
         # Получаем список файлов задачи
         files = task.file_urls.split(',') if task.file_urls else []
@@ -389,8 +415,8 @@ def update_task_position():
     position = data.get('position') # 'before', 'after', 'start', 'end'
 
     dragged_task = Task.query.get_or_404(task_id)
-    if dragged_task.user_id != current_user.id:
-        return jsonify({'success': False, 'message': 'Нет доступа к этой задаче'}), 403
+    # if dragged_task.user_id != current_user.id:
+    #     return jsonify({'success': False, 'message': 'Нет доступа к этой задаче'}), 403
 
     old_category_id = dragged_task.category_id
 
@@ -403,14 +429,14 @@ def update_task_position():
             db.session.commit()
 
             # Пересчитываем order в старой категории
-            tasks_in_old_category = Task.query.filter_by(category_id=old_category_id, user_id=current_user.id).order_by(Task.order).all()
+            tasks_in_old_category = Task.query.filter_by(category_id=old_category_id).order_by(Task.order).all()
             for i, task in enumerate(tasks_in_old_category):
                 task.order = i
             db.session.commit()
 
         # Пересчитываем order в новой категории (или текущей, если категория не менялась)
         target_cat_id = int(new_category_id) if new_category_id else old_category_id
-        tasks_in_target_category = Task.query.filter_by(category_id=target_cat_id, user_id=current_user.id).order_by(Task.order).all()
+        tasks_in_target_category = Task.query.filter_by(category_id=target_cat_id).order_by(Task.order).all()
 
         # Удаляем перетаскиваемую задачу из списка для временного пересчета
         tasks_in_target_category = [t for t in tasks_in_target_category if t.id != dragged_task.id]
@@ -455,7 +481,7 @@ def update_task_position():
 @main.route('/get_tasks_by_category/<int:category_id>')
 @login_required
 def get_tasks_by_category(category_id):
-    tasks = Task.query.filter_by(category_id=category_id, user_id=current_user.id).order_by(Task.order).all()
+    tasks = Task.query.filter_by(category_id=category_id).order_by(Task.order).all()
     tasks_data = []
     for task in tasks:
         file_info = []
@@ -481,7 +507,8 @@ def get_tasks_by_category(category_id):
                 'created_at': task.created_at.strftime('%d.%m.%Y'),
                 'category_id': task.category_id
             },
-            'files': file_info
+            'files': file_info,
+            'file_urls': task.file_urls
         })
     return jsonify({'success': True, 'tasks': tasks_data})
 
